@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Location Tracker</title>
+  <title>Location & Photo Tracker</title>
   
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#007bff">
@@ -12,76 +12,155 @@
     body { 
       font-family: Arial, sans-serif; 
       text-align: center; 
-      margin-top: 50px; 
-      padding: 0 20px;
+      margin-top: 20px; 
+      padding: 0 10px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
     }
     button { 
-      padding: 12px 24px; 
+      padding: 12px 20px; 
       font-size: 16px; 
-      margin: 10px; 
+      margin: 8px 0; 
       cursor: pointer; 
       border-radius: 5px;
       border: none;
+      width: 100%;
     }
     #getLocationBtn { background-color: #007bff; color: white; }
-    #submitBtn { background-color: #0056b3; color: white; }
+    #captureBtn { background-color: #17a2b8; color: white; display: none; }
+    #submitBtn { background-color: #28a745; color: white; }
     #submitBtn:disabled { background-color: #cccccc; cursor: not-allowed; }
-    #installBtn { background-color: #28a745; color: white; display: none; }
-    #status { margin-top: 20px; font-weight: bold; color: #333; max-width: 400px; margin-left: auto; margin-right: auto; }
+    #installBtn { background-color: #6c757d; color: white; display: none; }
+    
+    #status { margin: 15px 0; font-weight: bold; color: #333; }
+    
+    #cameraContainer { display: none; margin: 15px 0; }
+    video { width: 100%; max-width: 400px; border-radius: 8px; border: 2px solid #333; }
+    canvas { display: none; }
+    #photoPreview { display: none; width: 100%; max-width: 200px; border-radius: 8px; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-  <h2>Send My Location</h2>
+  <h2>Location & Photo Tracker</h2>
   
-  <button id="getLocationBtn">1. Get My Location</button>
+  <button id="getLocationBtn">1. Get My GPS Location</button>
   <p id="status">Waiting for location...</p>
 
-  <form id="locationForm">
+  <div id="cameraContainer">
+    <video id="video" autoplay playsinline></video>
+    <button id="captureBtn">📸 Snap Photo Instantly</button>
+    <br>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <img id="photoPreview" alt="Snapshot Preview">
+  </div>
+
+  <form id="dataForm">
     <input type="hidden" name="lat" id="lat">
     <input type="hidden" name="lng" id="lng">
-    <button type="submit" id="submitBtn" disabled>2. Save to Google Sheet</button>
+    <input type="hidden" name="photo" id="photo">
+    <button type="submit" id="submitBtn" disabled>3. Save Data to Google Sheet</button>
   </form>
 
   <button id="installBtn">📱 Install App</button>
 
   <script>
     // ==========================================
-    // 1. CONFIGURE YOUR GOOGLE WEB APP URL HERE
+    // CONFIGURE YOUR GOOGLE WEB APP URL HERE
     // ==========================================
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbz2n6Q8R-UYHNfn90ttSB3B4ukB8pJSjtYG0ohZ26MrVuBf2EyCyh6IN8tUzB29_xiS/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxYd6o6kenDi6eoTaiXSSiNESR30NoZusm3Pu_tB2Jc7tM-NkQdYuBUKkggjBIkqxFk/exec';
     
-    const form = document.forms['locationForm'];
+    const form = document.forms['dataForm'];
     const status = document.getElementById('status');
     const submitBtn = document.getElementById('submitBtn');
+    
+    const cameraContainer = document.getElementById('cameraContainer');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const photoPreview = document.getElementById('photoPreview');
+    const captureBtn = document.getElementById('captureBtn');
 
-    // 2. Get Location using HTML5 Geolocation API
+    let stream = null;
+
+    // 1. Get Location using HTML5 Geolocation API
     document.getElementById('getLocationBtn').addEventListener('click', () => {
       if (navigator.geolocation) {
-        status.innerText = "Locating... Please allow location access in your browser.";
+        status.innerText = "Locating... Please allow GPS access.";
         
         navigator.geolocation.getCurrentPosition(position => {
-          // Put the coordinates into our hidden form inputs
           document.getElementById('lat').value = position.coords.latitude;
           document.getElementById('lng').value = position.coords.longitude;
           
-          status.innerText = `Location found! Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}`;
-          submitBtn.disabled = false; // Turn on the submit button
+          status.innerText = `GPS Locked! Lat: ${position.coords.latitude.toFixed(4)}, Lng: ${position.coords.longitude.toFixed(4)}. Now opening camera...`;
+          
+          // Start the high-performance camera automatically
+          startCamera();
         }, error => {
-          status.innerText = "Error: Unable to retrieve your location. " + error.message;
+          status.innerText = "Error retrieving GPS. " + error.message;
         });
       } else {
         status.innerText = "Geolocation is not supported by your browser.";
       }
     });
 
-    // 3. Send Data to Google Sheets
+    // 2. High-Performance Camera Stream
+    async function startCamera() {
+      try {
+        // Request rear camera preferentially on mobile devices
+        const constraints = { video: { facingMode: { exact: "environment" } } };
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        cameraContainer.style.display = 'block';
+        captureBtn.style.display = 'block';
+      } catch (err) {
+        // Fallback to any available camera if rear camera constraint fails
+        try {
+          const fallbackConstraints = { video: true };
+          stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+          video.srcObject = stream;
+          cameraContainer.style.display = 'block';
+          captureBtn.style.display = 'block';
+        } catch (fallbackErr) {
+          status.innerText = "Camera access failed. Proceeding with GPS only. " + fallbackErr.message;
+          console.error("Camera error:", fallbackErr);
+        }
+      }
+    }
+
+    // Instant Snapshot Trigger
+    captureBtn.addEventListener('click', () => {
+      // Draw frame directly to canvas at native resolution for blistering speed
+      const context = canvas.getContext('2d');
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      // Compress to JPEG with 0.7 quality for small network payload & fast processing
+      const base64Image = canvas.toDataURL('image/jpeg', 0.7);
+      
+      // Store Base64 string into hidden input
+      document.getElementById('photo').value = base64Image;
+      
+      // Show instant preview
+      photoPreview.src = base64Image;
+      photoPreview.style.display = 'block';
+      
+      // Stop the camera stream to free up phone memory/battery
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      video.style.display = 'none';
+      captureBtn.style.display = 'none';
+      
+      status.innerText = "Photo Captured Instantly! Ready to save.";
+      submitBtn.disabled = false;
+    });
+
+    // 3. Send Data (GPS + Photo) to Google Sheets
     form.addEventListener('submit', e => {
-      e.preventDefault(); // Stop the page from reloading
-      status.innerText = "Saving to Google Sheets...";
+      e.preventDefault();
+      status.innerText = "Saving data & photo to Google Sheets...";
       submitBtn.disabled = true;
 
-      // Convert the form data into a URL string Google can read easily
       const data = new URLSearchParams(new FormData(form));
 
       fetch(scriptURL, { 
@@ -90,7 +169,7 @@
         mode: 'no-cors' 
       })
         .then(() => {
-          status.innerText = "Success! Location saved to your Google Sheet.";
+          status.innerText = "Success! Location and photo saved to your Google Sheet.";
         })
         .catch(error => {
           status.innerText = "Error saving location.";
@@ -102,42 +181,27 @@
     // ==========================================
     // 4. PWA INSTALLATION LOGIC
     // ==========================================
-    
-    // Register Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.geolocation.getCurrentPosition(() => {}, () => {}); // Wakes up location permission slightly earlier if needed
-        navigator.registerProtocolHandler
         navigator.serviceWorker.register('./sw.js')
           .then((reg) => console.log('Service worker registered.', reg))
           .catch((err) => console.log('Service worker registration failed:', err));
       });
     }
 
-    // Capture the install prompt
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
 
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
-      // Stash the event so it can be triggered later
       deferredPrompt = e;
-      // Show our custom install button
       installBtn.style.display = 'block';
 
       installBtn.addEventListener('click', () => {
         installBtn.style.display = 'none';
-        // Show the browser install prompt
         deferredPrompt.prompt();
-        
-        // Wait for the user to respond to the prompt
         deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted the install prompt');
-          } else {
-            console.log('User dismissed the install prompt');
-          }
+          if (choiceResult.outcome === 'accepted') console.log('PWA installed');
           deferredPrompt = null;
         });
       });
