@@ -25,7 +25,7 @@
 
   <script>
     // PASTE YOUR GOOGLE SCRIPT URL HERE
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwBKZVfhr1UE_s2bKuQvtiRs1zQELHnqZEfeMcdDXKHD7ywTq_vlX_yN2xmtTVeArdTGw/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwMgpfPgUX2jtjRj8S9Gd1dIx7KuuWpp7yMqobkPuqZ-Wof7zVtJsyK3ORnOVU7ZlKE4w/exec';
     
     const form = document.forms['locationForm'];
     const status = document.getElementById('status');
@@ -57,8 +57,9 @@
       status.innerText = "Saving to Google Sheets...";
       submitBtn.disabled = true;
 
-      fetch(scriptURL, { method: 'POST', body: new FormData(form) })
-        .then(response => {
+fetch(scriptURL, { method: 'POST', body: new FormData(form), mode: 'no-cors' })
+        .then(() => {
+          // Because of no-cors, we can't read Google's response, but we know it sent!
           status.innerText = "Success! Location saved to your Google Sheet.";
         })
         .catch(error => {
