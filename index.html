@@ -3,11 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Location to Google Sheets</title>
+  <title>Location Tracker</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007bff">
+
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    button { padding: 10px 20px; font-size: 16px; margin: 10px; cursor: pointer; }
-    #status { margin-top: 20px; font-weight: bold; color: #333; }
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      margin-top: 50px; 
+      padding: 0 20px;
+    }
+    button { 
+      padding: 12px 24px; 
+      font-size: 16px; 
+      margin: 10px; 
+      cursor: pointer; 
+      border-radius: 5px;
+      border: none;
+    }
+    #getLocationBtn { background-color: #007bff; color: white; }
+    #submitBtn { background-color: #0056b3; color: white; }
+    #submitBtn:disabled { background-color: #cccccc; cursor: not-allowed; }
+    #installBtn { background-color: #28a745; color: white; display: none; }
+    #status { margin-top: 20px; font-weight: bold; color: #333; max-width: 400px; margin-left: auto; margin-right: auto; }
   </style>
 </head>
 <body>
@@ -23,18 +43,22 @@
     <button type="submit" id="submitBtn" disabled>2. Save to Google Sheet</button>
   </form>
 
+  <button id="installBtn">📱 Install App</button>
+
   <script>
-    // PASTE YOUR GOOGLE SCRIPT URL HERE
+    // ==========================================
+    // 1. CONFIGURE YOUR GOOGLE WEB APP URL HERE
+    // ==========================================
     const scriptURL = 'https://script.google.com/macros/s/AKfycbz2n6Q8R-UYHNfn90ttSB3B4ukB8pJSjtYG0ohZ26MrVuBf2EyCyh6IN8tUzB29_xiS/exec';
     
     const form = document.forms['locationForm'];
     const status = document.getElementById('status');
     const submitBtn = document.getElementById('submitBtn');
 
-    // 1. Get Location using HTML5 Geolocation API
+    // 2. Get Location using HTML5 Geolocation API
     document.getElementById('getLocationBtn').addEventListener('click', () => {
       if (navigator.geolocation) {
-        status.innerText = "Locating... Please allow location access.";
+        status.innerText = "Locating... Please allow location access in your browser.";
         
         navigator.geolocation.getCurrentPosition(position => {
           // Put the coordinates into our hidden form inputs
@@ -51,13 +75,13 @@
       }
     });
 
-    // 2. Send Data to Google Sheets
+    // 3. Send Data to Google Sheets
     form.addEventListener('submit', e => {
       e.preventDefault(); // Stop the page from reloading
       status.innerText = "Saving to Google Sheets...";
       submitBtn.disabled = true;
 
-// Convert the form data into a URL string Google can read easily
+      // Convert the form data into a URL string Google can read easily
       const data = new URLSearchParams(new FormData(form));
 
       fetch(scriptURL, { 
@@ -73,6 +97,50 @@
           console.error('Error!', error);
           submitBtn.disabled = false;
         });
+    });
+
+    // ==========================================
+    // 4. PWA INSTALLATION LOGIC
+    // ==========================================
+    
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.geolocation.getCurrentPosition(() => {}, () => {}); // Wakes up location permission slightly earlier if needed
+        navigator.registerProtocolHandler
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('Service worker registered.', reg))
+          .catch((err) => console.log('Service worker registration failed:', err));
+      });
+    }
+
+    // Capture the install prompt
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      deferredPrompt = e;
+      // Show our custom install button
+      installBtn.style.display = 'block';
+
+      installBtn.addEventListener('click', () => {
+        installBtn.style.display = 'none';
+        // Show the browser install prompt
+        deferredPrompt.prompt();
+        
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          } else {
+            console.log('User dismissed the install prompt');
+          }
+          deferredPrompt = null;
+        });
+      });
     });
   </script>
 
