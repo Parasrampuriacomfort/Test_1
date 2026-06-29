@@ -1,212 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Location & Photo Tracker</title>
-  
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#007bff">
-
-  <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      text-align: center; 
-      margin-top: 20px; 
-      padding: 0 10px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    button { 
-      padding: 12px 20px; 
-      font-size: 16px; 
-      margin: 8px 0; 
-      cursor: pointer; 
-      border-radius: 5px;
-      border: none;
-      width: 100%;
-    }
-    #getLocationBtn { background-color: #007bff; color: white; }
-    #captureBtn { background-color: #17a2b8; color: white; display: none; }
-    #submitBtn { background-color: #28a745; color: white; }
-    #submitBtn:disabled { background-color: #cccccc; cursor: not-allowed; }
-    #installBtn { background-color: #6c757d; color: white; display: none; }
-    
-    #status { margin: 15px 0; font-weight: bold; color: #333; }
-    
-    #cameraContainer { display: none; margin: 15px 0; }
-    video { width: 100%; max-width: 400px; border-radius: 8px; border: 2px solid #333; }
-    canvas { display: none; }
-    #photoPreview { display: none; width: 100%; max-width: 200px; border-radius: 8px; margin-top: 10px; }
-  </style>
-</head>
-<body>
-
-  <h2>Location & Photo Tracker</h2>
-  
-  <button id="getLocationBtn">1. Get My GPS Location</button>
-  <p id="status">Waiting for location...</p>
-
-  <div id="cameraContainer">
-    <video id="video" autoplay playsinline></video>
-    <button id="captureBtn">📸 Snap Photo Instantly</button>
-    <br>
-    <canvas id="canvas" width="640" height="480"></canvas>
-    <img id="photoPreview" alt="Snapshot Preview">
-  </div>
-
-  <form id="dataForm">
-    <input type="hidden" name="lat" id="lat">
-    <input type="hidden" name="lng" id="lng">
-    <input type="hidden" name="photo" id="photo">
-    <button type="submit" id="submitBtn" disabled>3. Save Data to Google Sheet</button>
-  </form>
-
-  <button id="installBtn">📱 Install App</button>
-
-  <script>
-    // ==========================================
-    // CONFIGURE YOUR GOOGLE WEB APP URL HERE
-    // ==========================================
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxYd6o6kenDi6eoTaiXSSiNESR30NoZusm3Pu_tB2Jc7tM-NkQdYuBUKkggjBIkqxFk/exec';
-    
-    const form = document.forms['dataForm'];
-    const status = document.getElementById('status');
-    const submitBtn = document.getElementById('submitBtn');
-    
-    const cameraContainer = document.getElementById('cameraContainer');
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const photoPreview = document.getElementById('photoPreview');
-    const captureBtn = document.getElementById('captureBtn');
-
-    let stream = null;
-
-    // 1. Get Location using HTML5 Geolocation API
-    document.getElementById('getLocationBtn').addEventListener('click', () => {
-      if (navigator.geolocation) {
-        status.innerText = "Locating... Please allow GPS access.";
-        
-        navigator.geolocation.getCurrentPosition(position => {
-          document.getElementById('lat').value = position.coords.latitude;
-          document.getElementById('lng').value = position.coords.longitude;
-          
-          status.innerText = `GPS Locked! Lat: ${position.coords.latitude.toFixed(4)}, Lng: ${position.coords.longitude.toFixed(4)}. Now opening camera...`;
-          
-          // Start the high-performance camera automatically
-          startCamera();
-        }, error => {
-          status.innerText = "Error retrieving GPS. " + error.message;
-        });
-      } else {
-        status.innerText = "Geolocation is not supported by your browser.";
-      }
-    });
-
-    // 2. High-Performance Camera Stream
-    async function startCamera() {
-      try {
-        // Request rear camera preferentially on mobile devices
-        const constraints = { video: { facingMode: { exact: "environment" } } };
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream;
-        cameraContainer.style.display = 'block';
-        captureBtn.style.display = 'block';
-      } catch (err) {
-        // Fallback to any available camera if rear camera constraint fails
-        try {
-          const fallbackConstraints = { video: true };
-          stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
-          video.srcObject = stream;
-          cameraContainer.style.display = 'block';
-          captureBtn.style.display = 'block';
-        } catch (fallbackErr) {
-          status.innerText = "Camera access failed. Proceeding with GPS only. " + fallbackErr.message;
-          console.error("Camera error:", fallbackErr);
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Presence - Attendance</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#c6c6c6", "tertiary-fixed-dim": "#c6c6c7", "on-surface-variant": "#4c4546",
+                        "primary-fixed": "#e2e2e2", "on-tertiary-fixed": "#1a1c1c", "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a", "secondary-container": "#e1dfdf", "tertiary-container": "#1a1c1c",
+                        "tertiary-fixed": "#e2e2e2", "surface-container-lowest": "#ffffff", "on-primary-fixed-variant": "#474747",
+                        "surface-container-high": "#e8e8e8", "surface-variant": "#e2e2e2", "surface-container": "#eeeeee",
+                        "on-primary-fixed": "#1b1b1b", "secondary-fixed-dim": "#c7c6c6", "surface": "#f9f9f9",
+                        "surface-container-low": "#f3f3f4", "error": "#ba1a1a", "surface-bright": "#f9f9f9",
+                        "error-container": "#ffdad6", "on-tertiary": "#ffffff", "on-surface": "#1a1c1c",
+                        "primary-fixed-dim": "#c6c6c6", "surface-dim": "#dadada", "secondary": "#5e5e5e",
+                        "primary": "#000000", "on-error": "#ffffff", "secondary-fixed": "#e4e2e2",
+                        "on-secondary-fixed": "#1b1c1c", "background": "#f9f9f9", "on-background": "#1a1c1c",
+                        "outline-variant": "#cfc4c5", "on-primary-container": "#848484", "inverse-on-surface": "#f0f1f1",
+                        "on-primary": "#ffffff", "on-tertiary-container": "#838484", "inverse-surface": "#2f3131",
+                        "outline": "#7e7576", "on-tertiary-fixed-variant": "#454747", "surface-tint": "#5e5e5e",
+                        "on-secondary-fixed-variant": "#464747", "surface-container-highest": "#e2e2e2",
+                        "tertiary": "#000000", "on-secondary-container": "#626262", "primary-container": "#1b1b1b"
+                    },
+                    "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                    "spacing": { "margin-desktop": "40px", "stack-sm": "8px", "unit": "4px", "stack-md": "16px", "margin-mobile": "20px", "gutter": "16px", "stack-lg": "32px", "container-padding": "24px" },
+                    "fontFamily": { "headline-sm": ["Hanken Grotesk"], "body-md": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "body-sm": ["Inter"], "headline-lg": ["Hanken Grotesk"], "label-sm": ["Inter"], "headline-md": ["Hanken Grotesk"], "headline-xl": ["Hanken Grotesk"] },
+                    "fontSize": { "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }] }
+                }
+            }
         }
-      }
+    </script>
+    <style>
+        .map-pulse { animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+        @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(2.4); opacity: 0; } }
+        .ambient-shadow-level-2 { box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.05); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen pb-24 text-primary">
+
+<header class="w-full top-0 sticky z-40 bg-surface border-b border-surface-container flex items-center justify-between px-margin-mobile h-16">
+    <button class="text-primary p-2 -ml-2 rounded-full"><span class="material-symbols-outlined">menu</span></button>
+    <h1 class="text-xl font-bold tracking-tight text-primary">Presence</h1>
+    <div class="w-8 h-8 rounded-full overflow-hidden border border-surface-container bg-surface-container-low">
+        <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtcOZCl3_wwHw5sgUG-pSonf2rfjC0XmgfM6YZWrApqE1OsSBnP93eGeSfFGYUEWLX6GkXuRn942XY7ahobSLVNkts8T16HnJX1DmwxN3GDgdBBwqcCkCJ6m1Q7Cr0feTmpYDy_nX9fPDCPaRNqTBjh0XQ9p85uqlspWIzDGqT6JK92Fk7x1OaQ5KGkcFEaIXvkWJNs0hbT7_mzOhgxa3x47lorBaPKSJQuVA14D0ffgrw34tt-SVo6Dp1biFuoFzJluR90fqD7g"/>
+    </div>
+</header>
+
+<main class="px-margin-mobile py-stack-lg max-w-2xl mx-auto flex flex-col gap-stack-lg">
+    <!-- Employee Mock Selector -->
+    <section class="bg-surface-container p-4 rounded-lg flex flex-col gap-2 border border-surface-container">
+        <label class="font-label-md text-secondary">कर्मचारी चुनो (Select Employee):</label>
+        <select id="employeeSelect" class="w-full p-2 bg-surface rounded border border-outline-variant text-body-md font-medium">
+            <option value="siddharth@parasrampuriacomfort.com|Siddharth Saini">Siddharth Saini</option>
+            <option value="ashutosh@parasrampuriacomfort.com|Ashutosh Yadav">Ashutosh Yadav</option>
+            <option value="mohit@parasrampuriacomfort.com|Mohit Khandelwal">Mohit Khandelwal</option>
+        </select>
+    </section>
+
+    <!-- Action Section -->
+    <section class="flex flex-col gap-stack-md">
+        <div class="grid grid-cols-2 gap-gutter">
+            <button onclick="handleAttendance('checkin')" class="bg-primary text-on-primary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-opacity-90 active:scale-[0.98] transition-all ambient-shadow-level-2 h-32">
+                <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">login</span>
+                <span class="font-headline-sm">Check In</span>
+            </button>
+            <button onclick="handleAttendance('checkout')" class="bg-surface-container-lowest border border-outline-variant text-primary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-surface-container-low active:scale-[0.98] transition-all h-32">
+                <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 0;">logout</span>
+                <span class="font-headline-sm">Check Out</span>
+            </button>
+        </div>
+        <div class="text-center">
+            <span id="currentStatus" class="font-body-sm text-secondary">Current Status: Ready</span>
+        </div>
+    </section>
+
+    <!-- Live Location Map Box -->
+    <section class="flex flex-col gap-stack-md">
+        <div class="flex items-center justify-between">
+            <h2 class="font-headline-md text-headline-md">Current Location</h2>
+            <span class="bg-[#e8f5e9] text-[#2e7d32] font-label-sm text-label-sm px-2 py-1 rounded flex items-center gap-1">
+                <span class="w-1.5 h-1.5 bg-[#2e7d32] rounded-full inline-block"></span> Verified
+            </span>
+        </div>
+        <div class="relative w-full h-48 bg-surface-container-low rounded-lg border border-surface-container overflow-hidden flex items-center justify-center ambient-shadow-level-2">
+            <div class="absolute inset-0 bg-surface-container flex items-center justify-center">
+                <span class="material-symbols-outlined text-secondary opacity-20 text-[64px]">map</span>
+            </div>
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="w-12 h-12 absolute -inset-3 bg-primary rounded-full map-pulse"></div>
+                <div class="w-4 h-4 bg-primary rounded-full shadow-md z-20 border-2 border-surface-container-lowest"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Activity -->
+    <section class="flex flex-col gap-stack-sm">
+        <h2 class="font-headline-md text-headline-md mb-2">Recent Activity (Google Sheet सू)</h2>
+        <div id="activityLog" class="bg-surface-container-lowest rounded-lg border border-surface-container ambient-shadow-level-2 divide-y divide-surface-container">
+            <!-- डेटा लोड होसी जद अठै दिखसी -->
+            <div class="p-4 text-center text-secondary">डेटा लोड हो रयो है सा...</div>
+        </div>
+    </section>
+</main>
+
+<script>
+    // ⚠️ अठै थारो Google Apps Script Web App वालो URL पेस्ट करो!
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYyd1XRlRgve679wIR9586NiO4Zn2m35bjpdfg1R5YaYdk4V-_L7qu7xyifxIW0Jux/exec";
+
+    async function handleAttendance(action) {
+        const statusText = document.getElementById("currentStatus");
+        const employeeData = document.getElementById("employeeSelect").value.split("|");
+        const email = employeeData[0];
+        const name = employeeData[1];
+
+        statusText.innerText = `प्रक्रिया जारी है सा (${action})...`;
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", // CORS रे झंझट सू बचवा सारु
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action, email, name })
+            });
+
+            statusText.innerText = `Status: ${action === 'checkin' ? 'Checked In' : 'Checked Out'} Successfully!`;
+            setTimeout(loadActivity, 2000); // 2 सेकंड बाद लिस्ट अपडेट करो
+        } catch (error) {
+            statusText.innerText = "त्रुटि आई है, पाछो कोसिस करो सा।";
+            console.error(error);
+        }
     }
 
-    // Instant Snapshot Trigger
-    captureBtn.addEventListener('click', () => {
-      // Draw frame directly to canvas at native resolution for blistering speed
-      const context = canvas.getContext('2d');
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      
-      // Compress to JPEG with 0.7 quality for small network payload & fast processing
-      const base64Image = canvas.toDataURL('image/jpeg', 0.7);
-      
-      // Store Base64 string into hidden input
-      document.getElementById('photo').value = base64Image;
-      
-      // Show instant preview
-      photoPreview.src = base64Image;
-      photoPreview.style.display = 'block';
-      
-      // Stop the camera stream to free up phone memory/battery
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-      video.style.display = 'none';
-      captureBtn.style.display = 'none';
-      
-      status.innerText = "Photo Captured Instantly! Ready to save.";
-      submitBtn.disabled = false;
-    });
+    async function loadActivity() {
+        const logContainer = document.getElementById("activityLog");
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const data = await response.json();
+            
+            if (data.length === 0) {
+                logContainer.innerHTML = `<div class="p-4 text-center text-secondary">कोई रिकॉर्ड नी मिल्यो सा।</div>`;
+                return;
+            }
 
-    // 3. Send Data (GPS + Photo) to Google Sheets
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      status.innerText = "Saving data & photo to Google Sheets...";
-      submitBtn.disabled = true;
-
-      const data = new URLSearchParams(new FormData(form));
-
-      fetch(scriptURL, { 
-        method: 'POST', 
-        body: data, 
-        mode: 'no-cors' 
-      })
-        .then(() => {
-          status.innerText = "Success! Location and photo saved to your Google Sheet.";
-        })
-        .catch(error => {
-          status.innerText = "Error saving location.";
-          console.error('Error!', error);
-          submitBtn.disabled = false;
-        });
-    });
-
-    // ==========================================
-    // 4. PWA INSTALLATION LOGIC
-    // ==========================================
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((reg) => console.log('Service worker registered.', reg))
-          .catch((err) => console.log('Service worker registration failed:', err));
-      });
+            logContainer.innerHTML = data.map(item => `
+                <div class="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-surface-container rounded flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined">${item.punchOut ? 'logout' : 'login'}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-body-md font-medium text-primary">${item.name} (${item.punchOut ? 'Checked Out' : 'Checked In'})</span>
+                            <span class="font-label-sm text-secondary">समय: ${item.punchIn} ${item.punchOut ? 'सू ' + item.punchOut : ''}</span>
+                        </div>
+                    </div>
+                    <span class="font-label-sm text-secondary font-bold">${item.hours || 'Working'}</span>
+                </div>
+            `).join('');
+        } catch (error) {
+            logContainer.innerHTML = `<div class="p-4 text-center text-error">डेटा लोड करवा में दिक्कत आई सा।</div>`;
+        }
     }
 
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = 'block';
-
-      installBtn.addEventListener('click', () => {
-        installBtn.style.display = 'none';
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') console.log('PWA installed');
-          deferredPrompt = null;
-        });
-      });
-    });
-  </script>
-
+    // पेज लोड होता ही हालिया एक्टिविटी देखो
+    window.onload = loadActivity;
+</script>
 </body>
 </html>
