@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location to Google Sheets</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    button { padding: 10px 20px; font-size: 16px; margin: 10px; cursor: pointer; }
+    #status { margin-top: 20px; font-weight: bold; color: #333; }
+  </style>
+</head>
+<body>
+
+  <h2>Send My Location</h2>
+  
+  <button id="getLocationBtn">1. Get My Location</button>
+  <p id="status">Waiting for location...</p>
+
+  <form id="locationForm">
+    <input type="hidden" name="lat" id="lat">
+    <input type="hidden" name="lng" id="lng">
+    <button type="submit" id="submitBtn" disabled>2. Save to Google Sheet</button>
+  </form>
+
+  <script>
+    // PASTE YOUR GOOGLE SCRIPT URL HERE
+    const scriptURL = 'YOUR_WEB_APP_URL_HERE';
+    
+    const form = document.forms['locationForm'];
+    const status = document.getElementById('status');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // 1. Get Location using HTML5 Geolocation API
+    document.getElementById('getLocationBtn').addEventListener('click', () => {
+      if (navigator.geolocation) {
+        status.innerText = "Locating... Please allow location access.";
+        
+        navigator.geolocation.getCurrentPosition(position => {
+          // Put the coordinates into our hidden form inputs
+          document.getElementById('lat').value = position.coords.latitude;
+          document.getElementById('lng').value = position.coords.longitude;
+          
+          status.innerText = `Location found! Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}`;
+          submitBtn.disabled = false; // Turn on the submit button
+        }, error => {
+          status.innerText = "Error: Unable to retrieve your location. " + error.message;
+        });
+      } else {
+        status.innerText = "Geolocation is not supported by your browser.";
+      }
+    });
+
+    // 2. Send Data to Google Sheets
+    form.addEventListener('submit', e => {
+      e.preventDefault(); // Stop the page from reloading
+      status.innerText = "Saving to Google Sheets...";
+      submitBtn.disabled = true;
+
+      fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+        .then(response => {
+          status.innerText = "Success! Location saved to your Google Sheet.";
+        })
+        .catch(error => {
+          status.innerText = "Error saving location.";
+          console.error('Error!', error.message);
+          submitBtn.disabled = false;
+        });
+    });
+  </script>
+
+</body>
+</html>
