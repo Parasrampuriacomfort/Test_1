@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<script>
+if (localStorage.getItem("loggedIn") === "true") {
+    window.location.href = "Home.html";
+}
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Presence - Login</title>
+<!-- Google Fonts: Hanken Grotesk & Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#dadada",
+                    "on-secondary-container": "#626262",
+                    "on-primary-container": "#848484",
+                    "secondary-fixed-dim": "#c7c6c6",
+                    "error": "#ba1a1a",
+                    "inverse-primary": "#c6c6c6",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#f9f9f9",
+                    "primary-fixed-dim": "#c6c6c6",
+                    "error-container": "#ffdad6",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#1b1b1b",
+                    "tertiary": "#000000",
+                    "outline": "#7e7576",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "surface-container": "#eeeeee",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "surface-tint": "#5e5e5e",
+                    "primary": "#000000",
+                    "primary-container": "#1b1b1b",
+                    "on-secondary-fixed-variant": "#464747",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#1a1c1c",
+                    "on-primary-fixed-variant": "#474747",
+                    "surface": "#f9f9f9",
+                    "secondary": "#5e5e5e",
+                    "surface-variant": "#e2e2e2",
+                    "on-tertiary-container": "#838484",
+                    "on-tertiary": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "background": "#f9f9f9",
+                    "primary-fixed": "#e2e2e2",
+                    "secondary-fixed": "#e4e2e2",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-surface-variant": "#4c4546",
+                    "outline-variant": "#cfc4c5",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#e2e2e2",
+                    "surface-container-high": "#e8e8e8",
+                    "secondary-container": "#e1dfdf",
+                    "tertiary-fixed": "#e2e2e2",
+                    "on-primary": "#ffffff",
+                    "on-background": "#1a1c1c",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "inverse-surface": "#2f3131",
+                    "inverse-on-surface": "#f0f1f1",
+                    "surface-container-low": "#f3f3f4"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "stack-lg": "32px",
+                    "gutter": "16px",
+                    "margin-desktop": "40px",
+                    "unit": "4px",
+                    "stack-md": "16px",
+                    "margin-mobile": "20px",
+                    "container-padding": "24px",
+                    "stack-sm": "8px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "headline-sm": ["Hanken Grotesk"],
+                    "headline-xl": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-xl-mobile": ["Hanken Grotesk"],
+                    "label-sm": ["Inter"],
+                    "headline-lg-mobile": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-xl-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f9f9f9;
+            color: #1a1c1c;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom micro-interactions */
+        .login-input:focus-within {
+            border-bottom-color: #000000;
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col items-center justify-center font-body-md text-body-md overflow-x-hidden">
+<!-- Subtle Background Detail for Premium feel (Aether Presence) -->
+<div class="fixed inset-0 pointer-events-none opacity-20 z-0">
+<div class="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-surface-container rounded-full blur-[100px]"></div>
+<div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-surface-container-high rounded-full blur-[100px]"></div>
+</div>
+<main class="relative z-10 w-full max-w-[420px] px-margin-mobile md:px-0">
+<!-- Branding Section -->
+<header class="text-center mb-stack-lg">
+<h1 class="font-headline-xl-mobile text-headline-xl-mobile md:font-headline-xl md:text-headline-xl text-primary tracking-tighter mb-2">
+                Presence
+            </h1>
+<p class="font-body-md text-body-md text-secondary">
+                Sign in to your account
+            </p>
+</header>
+<!-- Login Container -->
+
+</button>
+</div>
+</div>
+<!-- Action Button -->
+<div
+    id="g_id_onload"
+    data-client_id="593594678995-lpqv5po66m0ji862b3l574bos9h8cee8.apps.googleusercontent.com"
+    data-callback="handleCredentialResponse">
+</div>
+
+<div
+    class="g_id_signin"
+    data-type="standard"
+    data-size="large"
+    data-theme="outline"
+    data-text="signin_with"
+    data-shape="pill"
+    data-logo_alignment="left">
+</div>
+
+</div>
+</form>
+
+</footer>
+</main>
+<!-- Visual Polish: Floating Element -->
+<div class="fixed bottom-margin-mobile right-margin-mobile hidden md:block opacity-10 animate-float pointer-events-none">
+<span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'wght' 100;">fingerprint</span>
+</div>
+<script>
+        function togglePassword() {
+            const pwd = document.getElementById('password');
+            const icon = document.getElementById('passwordIcon');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                pwd.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+
+
+
+function parseJwt(token) {
+
+    const base64Url = token.split('.')[1];
+
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+
+    return JSON.parse(atob(base64));
+
+}
+function handleCredentialResponse(response) {
+
+    const user = parseJwt(response.credential);
+
+    console.log(user);
+
+    localStorage.setItem("loggedIn", "true");
+    localStorage.setItem("name", user.name);
+    localStorage.setItem("email", user.email);
+    localStorage.setItem("photo", user.picture);
+
+    window.location.href = "Home.html";
+
+}
+
+    </script>
+</body></html>

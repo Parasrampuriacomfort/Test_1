@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Presence - Leave Management</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "on-primary-container": "#848484",
+                    "on-primary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#626262",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "surface-container": "#eeeeee",
+                    "on-background": "#1a1c1c",
+                    "surface-container-high": "#e8e8e8",
+                    "on-surface": "#1a1c1c",
+                    "on-secondary-fixed-variant": "#464747",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f0f1f1",
+                    "background": "#f9f9f9",
+                    "secondary-fixed-dim": "#c7c6c6",
+                    "surface-tint": "#5e5e5e",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#1a1c1c",
+                    "surface-bright": "#f9f9f9",
+                    "surface-dim": "#dadada",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-tertiary-container": "#838484",
+                    "secondary-container": "#e1dfdf",
+                    "tertiary-fixed": "#e2e2e2",
+                    "secondary-fixed": "#e4e2e2",
+                    "primary-fixed-dim": "#c6c6c6",
+                    "on-surface-variant": "#4c4546",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f3f3f4",
+                    "surface": "#f9f9f9",
+                    "inverse-surface": "#2f3131",
+                    "primary": "#000000",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#1b1b1b",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "outline": "#7e7576",
+                    "surface-variant": "#e2e2e2",
+                    "outline-variant": "#cfc4c5",
+                    "tertiary": "#000000",
+                    "secondary": "#5e5e5e",
+                    "primary-container": "#1b1b1b",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#e2e2e2",
+                    "on-primary-fixed-variant": "#474747",
+                    "inverse-primary": "#c6c6c6",
+                    "on-tertiary-fixed-variant": "#454747"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "gutter": "16px",
+                    "stack-md": "16px",
+                    "margin-desktop": "40px",
+                    "container-padding": "24px",
+                    "stack-lg": "32px",
+                    "margin-mobile": "20px",
+                    "stack-sm": "8px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Hanken Grotesk"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-xl-mobile": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "headline-xl": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-xl-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f9f9f9;
+            color: #1a1c1c;
+            font-family: 'Inter', sans-serif;
+        }
+        .bento-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .bento-card:active {
+            transform: scale(0.98);
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .bottom-sheet {
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        #toDateContainer {
+            transition: all 0.3s ease-out;
+            max-height: 200px;
+            opacity: 1;
+            transform-origin: top;
+        }
+        #toDateContainer.hidden-field {
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
+            margin-top: 0;
+            margin-bottom: 0;
+            overflow: hidden;
+            transform: scaleY(0);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-40 flex items-center justify-between px-margin-mobile h-16 bg-surface border-b border-surface-container">
+<div class="flex items-center gap-stack-md">
+<button class="active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile tracking-tight text-primary">Leave</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLeowp8GD9NIF8fs5R2RR13JIMlOFun02QPmWjxDgGnv4VlxLlY2y_m1UELtokWDfEcPbtWWhuAcZ4FDGKOGNGAW-Hzvr7H03zHYZ2R1Uh0p88HvmCdZPLN3DBYHVfMnGVuJrlDbG5MemMf4dOUNmBcPKJnYrmlQRkEIE1t1SlhELIXvUMrOR_sgNdplMmCyAGQ5Q_zk8SbECPyazJVGuQgh4pz9_EGensf5V-VMLPdvimw_u6E_yOryvLeCXWAyT9rCBFSyRIFQ"/>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 px-margin-mobile pt-stack-lg pb-48">
+<!-- Summary Stats Section -->
+<section class="grid grid-cols-2 gap-stack-md mb-stack-lg">
+<div class="col-span-2 bg-surface-container-lowest p-stack-md rounded-xl shadow-[0_12px_20px_0_rgba(0,0,0,0.04)] border border-surface-container flex flex-col gap-stack-md bento-card">
+<div class="flex justify-between items-center">
+<div class="flex flex-col">
+<div class="flex items-baseline gap-1"></div>
+</div>
+<span class="font-label-md text-label-md text-primary">October 2026</span>
+</div>
+<div class="grid grid-cols-7 gap-1">
+<!-- Weekday Headers -->
+<div class="text-center font-label-sm text-[10px] text-secondary">S</div>
+<div class="text-center font-label-sm text-[10px] text-secondary">M</div>
+<div class="text-center font-label-sm text-[10px] text-secondary">T</div>
+<div class="text-center font-label-sm text-[10px] text-secondary">W</div>
+<div class="text-center font-label-sm text-[10px] text-secondary">T</div>
+<div class="text-center font-label-sm text-[10px] text-secondary">F</div>
+<div class="text-center font-label-sm text-[10px] text-secondary">S</div>
+<!-- Calendar content remains identical to source -->
+<div class="h-4 border border-transparent"></div>
+<div class="h-4 border border-transparent"></div>
+<div class="h-4 border border-transparent"></div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">1</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">2</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">3</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">4</div>
+<div class="h-4 border border-outline-variant rounded-sm flex items-center justify-center text-[8px] text-secondary">5</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">6</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">7</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">8</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">9</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">10</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">11</div>
+<div class="h-4 border border-outline-variant rounded-sm flex items-center justify-center text-[8px] text-secondary">12</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">13</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">14</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">15</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">16</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">17</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">18</div>
+<div class="h-4 border border-outline-variant rounded-sm flex items-center justify-center text-[8px] text-secondary">19</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">20</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">21</div>
+<div class="h-4 bg-error rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">22</div>
+<div class="h-4 bg-error rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">23</div>
+<div class="h-4 bg-primary rounded-sm flex items-center justify-center text-[8px] text-on-primary font-bold">24</div>
+<div class="h-4 bg-surface-container rounded-sm flex items-center justify-center text-[8px] text-secondary">25</div>
+<div class="h-4 border border-outline-variant rounded-sm flex items-center justify-center text-[8px] text-secondary">26</div>
+<div class="h-4 bg-surface-container rounded-sm flex items-center justify-center text-[8px] text-secondary">27</div>
+<div class="h-4 bg-surface-container rounded-sm flex items-center justify-center text-[8px] text-secondary">28</div>
+<div class="h-4 bg-surface-container rounded-sm flex items-center justify-center text-[8px] text-secondary">29</div>
+<div class="h-4 bg-surface-container rounded-sm flex items-center justify-center text-[8px] text-secondary">30</div>
+<div class="h-4 bg-surface-container rounded-sm flex items-center justify-center text-[8px] text-secondary">31</div>
+</div>
+</div>
+</section>
+<!-- Leave Status Tabs/Overview -->
+<div class="flex items-center justify-between mb-stack-md">
+<h2 class="font-headline-sm text-headline-sm text-primary">Recent History</h2>
+<button class="font-label-md text-label-md text-secondary hover:text-primary transition-colors">View All</button>
+</div>
+<div class="space-y-stack-md">
+<!-- Pending Card -->
+<div class="bg-surface-container-lowest p-stack-md rounded-xl shadow-[0_12px_20px_0_rgba(0,0,0,0.04)] border border-surface-container flex flex-col gap-stack-sm">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary">Sick Leave</span>
+<span class="font-body-sm text-body-sm text-secondary">Oct 24 — Oct 25</span>
+</div>
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container font-label-sm text-label-sm rounded-lg flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                    Pending
+                </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 italic">"Recovering from seasonal flu..."</p>
+</div>
+<!-- Approved Card -->
+<div class="bg-surface-container-lowest p-stack-md rounded-xl shadow-[0_12px_20px_0_rgba(0,0,0,0.04)] border border-surface-container flex flex-col gap-stack-sm">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary">Annual Leave</span>
+<span class="font-body-sm text-body-sm text-secondary">Oct 10 (Half Day)</span>
+</div>
+<span class="px-2 py-1 bg-primary text-on-primary font-label-sm text-label-sm rounded-lg flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                    Approved
+                </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 italic">"Personal errands and family visit."</p>
+</div>
+<!-- Rejected Card -->
+<div class="bg-surface-container-lowest p-stack-md rounded-xl shadow-[0_12px_20px_0_rgba(0,0,0,0.04)] border border-surface-container flex flex-col gap-stack-sm">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary">Personal Leave</span>
+<span class="font-body-sm text-body-sm text-secondary">Sep 28 — Sep 30</span>
+</div>
+<span class="px-2 py-1 bg-error-container text-on-error-container font-label-sm text-label-sm rounded-lg flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">cancel</span>
+                    Rejected
+                </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 italic">"High project load during this period."</p>
+</div>
+</div>
+</main>
+<!-- Bottom Actions & Navigation Shell -->
+<div class="fixed bottom-0 left-0 w-full z-50 pointer-events-none">
+<!-- Floating Primary Action -->
+<div class="px-margin-mobile mb-4 pointer-events-auto">
+<button class="w-full bg-primary text-on-primary h-14 rounded-xl font-headline-sm text-headline-sm shadow-xl flex items-center justify-center gap-2 active:scale-95 transition-all duration-150" id="openLeaveForm">
+<span class="material-symbols-outlined">add</span>Apply for Leave
+        </button>
+</div>
+<!-- BottomNavBar -->
+<nav class="w-full flex justify-around items-center px-4 py-3 bg-surface border-t border-surface-container shadow-[0_-4px_20px_0_rgba(0,0,0,0.04)] pointer-events-auto">
+
+    <!-- Attendance -->
+    <button
+        onclick="window.location.href='Home.html'"
+        class="flex flex-col items-center justify-center text-on-surface-variant px-6 py-2 hover:bg-surface-container-high transition-colors active:scale-90 duration-200">
+
+        <span class="material-symbols-outlined">fingerprint</span>
+        <span class="font-label-md text-label-md">Attendance</span>
+    </button>
+
+    <!-- Leave (Current Page) -->
+    <button
+        onclick="window.location.href='Leave.html'"
+        class="flex flex-col items-center justify-center text-primary bg-secondary-container rounded-full px-6 py-2 active:scale-90 transition-all duration-200">
+
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">event_busy</span>
+        <span class="font-label-md text-label-md">Leave</span>
+    </button>
+
+</nav>
+</div>
+<!-- Modal Overlay -->
+<div class="modal-overlay fixed inset-0 z-[60]" id="modalOverlay"></div>
+<!-- Leave Application Bottom Sheet -->
+<div class="bottom-sheet fixed bottom-0 left-0 w-full bg-surface-container-lowest rounded-t-[2rem] z-[70] shadow-2xl p-margin-mobile overflow-y-auto max-h-[90vh] no-scrollbar" id="leaveSheet">
+<div class="w-12 h-1 bg-surface-container-highest rounded-full mx-auto mb-stack-lg"></div>
+<header class="flex justify-between items-center mb-stack-lg">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Apply Leave</h2>
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors" id="closeLeaveForm">
+<span class="material-symbols-outlined">close</span>
+</button>
+</header>
+<form class="space-y-stack-lg" id="leaveApplicationForm">
+<!-- Reason Dropdown -->
+<div class="space-y-1">
+<label class="font-label-sm text-label-sm text-secondary uppercase">Leave Reason</label>
+<select class="w-full bg-surface-container-low border-none rounded-lg p-stack-md font-body-md focus:ring-2 focus:ring-primary">
+<option>Select a reason</option>
+<option>Sick Leave</option>
+<option>Annual Leave</option>
+<option>Personal Leave</option>
+<option>Bereavement</option>
+</select>
+</div>
+<!-- Half Day Toggle -->
+<div class="space-y-stack-sm">
+<label class="font-label-sm text-label-sm text-secondary uppercase">Duration</label>
+<div class="grid grid-cols-3 gap-2">
+<button class="duration-toggle active bg-primary text-on-primary border border-primary py-2 rounded-lg font-label-md text-label-md transition-all" data-type="full" type="button">Full Day</button>
+<button class="duration-toggle bg-surface-container-low text-primary border border-transparent py-2 rounded-lg font-label-md text-label-md transition-all" data-type="morning" type="button">10:00 - 2:30</button>
+<button class="duration-toggle bg-surface-container-low text-primary border border-transparent py-2 rounded-lg font-label-md text-label-md transition-all" data-type="evening" type="button">2:30 - 7:00</button>
+</div>
+</div>
+<!-- Date Inputs -->
+<div class="grid grid-cols-2 gap-stack-md items-start">
+<div class="space-y-1">
+<label class="font-label-sm text-label-sm text-secondary uppercase">From Date</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg p-stack-md font-body-md focus:ring-2 focus:ring-primary" type="date"/>
+</div>
+<!-- Container for To Date that can be toggled -->
+<div class="space-y-1" id="toDateContainer">
+<label class="font-label-sm text-label-sm text-secondary uppercase">To Date</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg p-stack-md font-body-md focus:ring-2 focus:ring-primary" type="date"/>
+</div>
+</div>
+<!-- Remarks -->
+<div class="space-y-1">
+<label class="font-label-sm text-label-sm text-secondary uppercase">Remark</label>
+<textarea class="w-full bg-surface-container-low border-none rounded-lg p-stack-md font-body-md focus:ring-2 focus:ring-primary" placeholder="Additional details..." rows="3"></textarea>
+</div>
+<!-- Submit -->
+<div class="grid grid-cols-2 gap-stack-md mb-10">
+<button class="w-full border border-outline-variant text-primary h-14 rounded-xl font-headline-sm text-headline-sm active:scale-95 transition-all duration-150" id="cancelLeaveForm" type="button">Cancel</button>
+<button class="w-full bg-primary text-on-primary h-14 rounded-xl font-headline-sm text-headline-sm shadow-md active:scale-95 transition-all duration-150" type="submit">Save</button>
+</div>
+</form>
+</div>
+<script>
+    const openBtn = document.getElementById('openLeaveForm');
+    const closeBtn = document.getElementById('closeLeaveForm');
+    const cancelBtn = document.getElementById('cancelLeaveForm');
+    const overlay = document.getElementById('modalOverlay');
+    const sheet = document.getElementById('leaveSheet');
+    const toDateContainer = document.getElementById('toDateContainer');
+    const durationToggles = document.querySelectorAll('.duration-toggle');
+    const leaveForm = document.getElementById('leaveApplicationForm');
+
+    const toggleModal = (show) => {
+        if (show) {
+            overlay.classList.add('active');
+            sheet.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        } else {
+            overlay.classList.remove('active');
+            sheet.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    };
+
+    // Close functionality
+    openBtn.addEventListener('click', () => toggleModal(true));
+    closeBtn.addEventListener('click', () => toggleModal(false));
+    overlay.addEventListener('click', () => toggleModal(false));
+    cancelBtn.addEventListener('click', () => {
+        console.log('Leave application cancelled');
+        toggleModal(false);
+    });
+
+    // Form submission
+    leaveForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        console.log('Leave application submitted');
+        alert('Application submitted successfully!');
+        toggleModal(false);
+    });
+
+    // Duration toggle logic
+    durationToggles.forEach(toggle => {
+        toggle.addEventListener('click', () => {
+            const type = toggle.getAttribute('data-type');
+            
+            // Update active states
+            durationToggles.forEach(btn => {
+                btn.classList.remove('active', 'bg-primary', 'text-on-primary', 'border-primary');
+                btn.classList.add('bg-surface-container-low', 'text-primary', 'border-transparent');
+            });
+            
+            toggle.classList.add('active', 'bg-primary', 'text-on-primary', 'border-primary');
+            toggle.classList.remove('bg-surface-container-low', 'text-primary', 'border-transparent');
+
+            // Handle "To Date" visibility with slide animation classes
+            if (type === 'full') {
+                toDateContainer.classList.remove('hidden-field');
+            } else {
+                toDateContainer.classList.add('hidden-field');
+            }
+        });
+    });
+</script>
+</body></html>
