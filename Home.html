@@ -22,30 +22,15 @@
             theme: {
                 extend: {
                     "colors": {
-                        "inverse-primary": "#c6c6c6", "tertiary-fixed-dim": "#c6c6c7", "on-surface-variant": "#4c4546", "primary-fixed": "#e2e2e2",
-                        "on-tertiary-fixed": "#1a1c1c", "on-secondary": "#ffffff", "on-error-container": "#93000a", "secondary-container": "#e1dfdf",
-                        "tertiary-container": "#1a1c1c", "tertiary-fixed": "#e2e2e2", "surface-container-lowest": "#ffffff", "on-primary-fixed-variant": "#474747",
-                        "surface-container-high": "#e8e8e8", "surface-variant": "#e2e2e2", "surface-container": "#eeeeee", "on-primary-fixed": "#1b1b1b",
-                        "secondary-fixed-dim": "#c7c6c6", "surface": "#f9f9f9", "surface-container-low": "#f3f3f4", "error": "#ba1a1a",
-                        "surface-bright": "#f9f9f9", "error-container": "#ffdad6", "on-tertiary": "#ffffff", "on-surface": "#1a1c1c",
-                        "primary-fixed-dim": "#c6c6c6", "surface-dim": "#dadada", "secondary": "#5e5e5e", "primary": "#000000",
-                        "on-error": "#ffffff", "secondary-fixed": "#e4e2e2", "on-secondary-fixed": "#1b1c1c", "background": "#f9f9f9",
-                        "on-background": "#1a1c1c", "outline-variant": "#cfc4c5", "on-primary-container": "#848484", "inverse-on-surface": "#f0f1f1",
-                        "on-primary": "#ffffff", "on-tertiary-container": "#838484", "inverse-surface": "#2f3131", "outline": "#7e7576",
-                        "on-tertiary-fixed-variant": "#454747", "surface-tint": "#5e5e5e", "on-secondary-fixed-variant": "#464747",
-                        "surface-container-highest": "#e2e2e2", "tertiary": "#000000", "on-secondary-container": "#626262", "primary-container": "#1b1b1b"
+                        "surface-container-lowest": "#ffffff", "surface-container-high": "#e8e8e8",
+                        "surface-container": "#eeeeee", "surface-container-low": "#f3f3f4",
+                        "surface": "#f9f9f9", "error": "#ba1a1a", "secondary": "#5e5e5e",
+                        "primary": "#000000", "on-primary": "#ffffff", "on-surface": "#1a1c1c",
+                        "outline-variant": "#cfc4c5"
                     },
                     "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
-                    "spacing": { "margin-desktop": "40px", "stack-sm": "8px", "unit": "4px", "stack-md": "16px", "margin-mobile": "20px", "gutter": "16px", "stack-lg": "32px", "container-padding": "24px" },
-                    "fontFamily": { "headline-sm": ["Hanken Grotesk"], "body-md": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "body-sm": ["Inter"], "headline-lg": ["Hanken Grotesk"], "label-sm": ["Inter"], "headline-md": ["Hanken Grotesk"], "headline-xl": ["Hanken Grotesk"], "headline-lg-mobile": ["Hanken Grotesk"], "headline-xl-mobile": ["Hanken Grotesk"] },
-                    "fontSize": {
-                        "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
-                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
-                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
-                        "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-lg-mobile": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
-                        "headline-xl-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }]
-                    }
+                    "spacing": { "stack-md": "16px", "margin-mobile": "20px", "gutter": "16px", "stack-lg": "32px", "container-padding": "24px" },
+                    "fontFamily": { "headline-sm": ["Hanken Grotesk"], "body-md": ["Inter"], "label-md": ["Inter"], "body-sm": ["Inter"], "headline-md": ["Hanken Grotesk"], "headline-lg-mobile": ["Hanken Grotesk"] }
                 }
             }
         }
@@ -63,7 +48,6 @@
 
 <body class="bg-surface text-on-surface font-body-md min-h-screen pb-24 selection:bg-surface-container-highest selection:text-primary">
 
-    <!-- Loaders & Modals -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-2xl shadow-xl px-8 py-6 text-center">
             <div class="loader mx-auto mb-4"></div>
@@ -80,44 +64,39 @@
         </div>
     </div>
 
-    <!-- TopAppBar -->
     <header class="w-full top-0 sticky z-40 bg-surface border-b border-surface-container flex items-center justify-between px-margin-mobile h-16 w-full">
         <button class="text-primary hover:opacity-80 p-2 -ml-2 rounded-full interactive-btn">
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
         </button>
         <h1 class="text-headline-lg-mobile font-headline-lg-mobile tracking-tight text-primary">Presence</h1>
         <button class="hover:opacity-80 p-1 -mr-1 rounded-full border border-surface-container overflow-hidden w-8 h-8 flex items-center justify-center bg-surface-container-low interactive-btn">
-            <img alt="User profile photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtcOZCl3_wwHw5sgUG-pSonf2rfjC0XmgfM6YZWrApqE1OsSBnP93eGeSfFGYUEWLX6GkXuRn942XY7ahobSLVNkts8T16HnJX1DmwxN3GDgdBBwqcCkCJ6m1Q7Cr0feTmpYDy_nX9fPDCPaRNqTBjh0XQ9p85uqlspWIzDGqT6JK92Fk7x1OaQ5KGkcFEaIXvkWJNs0hbT7_mzOhgxa3x47lorBaPKSJQuVA14D0ffgrw34tt-SVo6Dp1biFuoFzJluR90fqD7g" id="profileImage">
+            <img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtcOZCl3_wwHw5sgUG-pSonf2rfjC0XmgfM6YZWrApqE1OsSBnP93eGeSfFGYUEWLX6GkXuRn942XY7ahobSLVNkts8T16HnJX1DmwxN3GDgdBBwqcCkCJ6m1Q7Cr0feTmpYDy_nX9fPDCPaRNqTBjh0XQ9p85uqlspWIzDGqT6JK92Fk7x1OaQ5KGkcFEaIXvkWJNs0hbT7_mzOhgxa3x47lorBaPKSJQuVA14D0ffgrw34tt-SVo6Dp1biFuoFzJluR90fqD7g" id="profileImage">
         </button>
     </header>
 
     <main class="px-margin-mobile py-stack-lg max-w-2xl mx-auto flex flex-col gap-stack-lg">
-        <!-- Hero Section: Check In / Out -->
         <section class="flex flex-col gap-stack-md">
             <div class="grid grid-cols-2 gap-gutter">
-                <!-- Check In Button -->
-                <button id="checkinButton" class="interactive-btn bg-surface-container-high text-secondary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 h-32 cursor-not-allowed opacity-60" disabled>
+                <button id="checkinButton" class="interactive-btn bg-surface-container-high text-secondary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 h-32 cursor-not-allowed opacity-60 w-full transition-all" disabled>
                     <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">login</span>
                     <span class="font-headline-sm text-headline-sm">Check In</span>
                 </button>
-                <!-- Check Out Button -->
-                <button id="checkoutButton" class="interactive-btn bg-surface-container-high text-secondary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 h-32 cursor-not-allowed opacity-60" disabled>
+                <button id="checkoutButton" class="interactive-btn bg-surface-container-high text-secondary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 h-32 cursor-not-allowed opacity-60 w-full transition-all" disabled>
                     <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 0;">logout</span>
                     <span class="font-headline-sm text-headline-sm">Check Out</span>
                 </button>
             </div>
             <div class="text-center">
-                <span id="locationMessage" class="font-body-sm text-body-sm text-secondary">Location Must Be Enable 📍</span>
+                <span class="font-body-sm text-body-sm text-secondary">Location Must Be Enable 📍</span>
             </div>
         </section>
 
-        <!-- Recent Activity -->
         <section class="flex flex-col gap-stack-sm">
             <h2 class="font-headline-md text-headline-md mb-2">Recent Activity</h2>
             <div class="bg-surface-container-lowest rounded-lg border border-surface-container">
                 <div id="attendanceList">
-                    <!-- Loading Bar Skeleton -->
                     <div class="p-4 flex flex-col gap-4 animate-pulse">
+                        <div class="h-16 bg-surface-container rounded-lg w-full"></div>
                         <div class="h-16 bg-surface-container rounded-lg w-full"></div>
                         <div class="h-16 bg-surface-container rounded-lg w-full"></div>
                     </div>
@@ -127,77 +106,60 @@
         </section>
     </main>
 
-    <!-- BottomNavBar -->
     <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface border-t border-surface-container z-50">
-        <button onclick="window.location.replace('Home.html')" class="interactive-btn flex flex-col items-center justify-center text-primary bg-secondary-container rounded-full px-6 py-2">
+        <button onclick="window.location.replace('Home.html')" class="interactive-btn flex flex-col items-center justify-center text-primary bg-surface-container-high rounded-full px-6 py-2">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings:'FILL' 1;">fingerprint</span>
             <span class="font-label-md text-label-md">Attendance</span>
         </button>
-        <button onclick="window.location.href='Leave.html'" class="interactive-btn flex flex-col items-center justify-center text-on-surface-variant px-6 py-2">
+        <button onclick="window.location.replace('Leave.html')" class="interactive-btn flex flex-col items-center justify-center text-secondary px-6 py-2">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings:'FILL' 0;">event_busy</span>
             <span class="font-label-md text-label-md">Leave</span>
         </button>
     </nav>
 
     <script>
-        const API_URL2 = "https://script.google.com/macros/s/AKfycbyJ81-WCQupQpdtmUlrgQdtMbcmgBES6ESVof1fXuqdLwZ1Cr3ghZCaKrFh3ig42hdh/exec";
+        // API Connections
+        const API_URL_POST = "https://script.google.com/macros/s/AKfycbyke_kVVkFvk-gLHZUKKHaicgJY2sJ0_ppbgq8kv7b1DK7xpTnYjQVF-Q7CD--5oTmk/exec";
+        const API_URL_GET = "https://script.google.com/macros/s/AKfycbyJ81-WCQupQpdtmUlrgQdtMbcmgBES6ESVof1fXuqdLwZ1Cr3ghZCaKrFh3ig42hdh/exec";
         
-        // --- BUTTON UI CONTROLLER ---
-        // Dynamically changes buttons to Solid Black (Active) or Gray (Disabled)
-        function updateButtonUI(canCheckIn, canCheckOut) {
+        let pendingAction = "";
+
+        // --- UI BUTTON CONTROLLER ---
+        function setButtonStates(canCheckIn, canCheckOut) {
             const cinBtn = document.getElementById("checkinButton");
             const coutBtn = document.getElementById("checkoutButton");
             
-            const activeClass = "interactive-btn bg-primary text-on-primary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 h-32 shadow-lg";
-            const disabledClass = "interactive-btn bg-surface-container-high text-secondary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 h-32 cursor-not-allowed opacity-60";
+            // Solid Black for Active, Gray for Disabled
+            const activeClass = "interactive-btn bg-black text-white py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 h-32 shadow-lg w-full transition-all";
+            const disabledClass = "interactive-btn bg-surface-container-high text-secondary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 h-32 cursor-not-allowed opacity-60 w-full transition-all";
 
-            if (cinBtn) {
-                cinBtn.disabled = !canCheckIn;
-                cinBtn.className = canCheckIn ? activeClass : disabledClass;
-            }
-            if (coutBtn) {
-                coutBtn.disabled = !canCheckOut;
-                coutBtn.className = canCheckOut ? activeClass : disabledClass;
-            }
+            cinBtn.disabled = !canCheckIn;
+            cinBtn.className = canCheckIn ? activeClass : disabledClass;
+            
+            coutBtn.disabled = !canCheckOut;
+            coutBtn.className = canCheckOut ? activeClass : disabledClass;
         }
 
-        // --- INSTANT CLICK FEEDBACK ---
-        // Overrides lag to immediately lock buttons and change colors on click
-        document.addEventListener("DOMContentLoaded", () => {
-            const cin = document.getElementById("checkinButton");
-            const cout = document.getElementById("checkoutButton");
-            
-            if(cin) cin.addEventListener("click", () => updateButtonUI(false, true)); // Disables Check-In, Makes Check-Out Black instantly
-            if(cout) cout.addEventListener("click", () => updateButtonUI(false, false)); // Disables both instantly
-        });
-
-        // --- FIX: GOOGLE SHEETS TIMEZONE BUG ---
+        // --- GOOGLE SHEETS TIMEZONE FIX ---
         function formatSafeTime(timeValue) {
             if (!timeValue || String(timeValue).trim() === "" || String(timeValue).includes("NaN")) return "--:--";
             let str = String(timeValue).trim();
             
+            // Reverse the Google Sheets Pacific Time shift
             if (str.includes("T")) {
                 const d = new Date(str);
                 if (!isNaN(d.getTime())) {
-                    // Google Sheets saves pure times as year 1899. 
-                    // This extracts the raw UTC time to bypass the +5:30 IST shift that causes the 06:20am bug.
-                    if (d.getFullYear() === 1899) {
-                        let h = d.getUTCHours();
-                        let m = d.getUTCMinutes();
-                        let ampm = h >= 12 ? 'pm' : 'am';
-                        h = h % 12 || 12;
-                        let hStr = h < 10 ? '0' + h : h;
-                        let mStr = m < 10 ? '0' + m : m;
-                        return `${hStr}:${mStr} ${ampm}`;
-                    }
-                    // Standard time extraction
-                    return d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+                    return d.toLocaleTimeString("en-US", { 
+                        timeZone: "America/Los_Angeles", 
+                        hour: "2-digit", 
+                        minute: "2-digit" 
+                    }).toLowerCase();
                 }
             }
-            return str; // If it's already a clean string like "05:00 PM"
+            return str;
         }
 
-        // --- RENDER RECENT ACTIVITY ---
+        // --- RENDER LIST ---
         function renderList(records) {
             const list = document.getElementById("attendanceList");
             if (!records || records.length === 0) {
@@ -207,12 +169,8 @@
 
             const htmlString = records.map(record => {
                 const dateStr = new Date(record.Date).toLocaleDateString("en-IN");
-                
-                // Bulletproof Time Formatting
                 const checkInStr = formatSafeTime(record["Check In"]);
                 const checkOutStr = formatSafeTime(record["Check Out"]);
-                
-                // Fix NaN on Total Working Hours
                 let hours = record["Total Working Hours"];
                 if (!hours || String(hours).includes("NaN")) hours = "--";
 
@@ -228,7 +186,7 @@
                         </div>
                     </div>
                     <div class="text-right">
-                        <span class="text-sm text-gray-500">${hours}</span>
+                        <span class="text-sm text-gray-500 font-medium">${hours}</span>
                     </div>
                 </div>`;
             }).join('');
@@ -236,25 +194,107 @@
             list.innerHTML = htmlString;
         }
 
-        // --- LOGIC: FETCH AND SET BUTTON STATES ---
+        // --- LOCATION HANDLING ---
+        function showLocationPopup() { document.getElementById("locationPopup").classList.remove("hidden"); }
+        function closeLocationPopup() { document.getElementById("locationPopup").classList.add("hidden"); }
+        
+        async function getLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) return reject("Geolocation not supported");
+                navigator.geolocation.getCurrentPosition(
+                    pos => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+                    err => { showLocationPopup(); reject(err); },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            });
+        }
+        
+        async function getAddress(lat, lon) {
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+                const data = await res.json();
+                return `${data.address.suburb || ""}, ${data.address.city || data.address.town || ""}, ${data.address.state || ""}`.replace(/^, /, '');
+            } catch(e) { return "Location unknown"; }
+        }
+
+        // --- SUBMIT DATA (NO RELOAD) ---
+        async function submitAttendance(actionType) {
+            document.getElementById("loadingTitle").innerText = actionType === 'checkin' ? "Checking In..." : "Checking Out...";
+            document.getElementById("loadingOverlay").classList.remove("hidden");
+
+            try {
+                const loc = await getLocation();
+                const addr = await getAddress(loc.lat, loc.lon);
+                
+                const now = new Date();
+                const dateStr = now.toISOString().split("T")[0];
+                const timeStr = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+                const email = localStorage.getItem("email");
+                const recordId = email + "_" + dateStr.replaceAll("-", "");
+
+                const payload = {
+                    action: actionType,
+                    recordId,
+                    employeeName: localStorage.getItem("name"),
+                    employeeEmail: email,
+                    date: dateStr
+                };
+                
+                if(actionType === 'checkin') {
+                    payload.checkIn = timeStr;
+                    payload.checkInLocation = addr;
+                } else {
+                    payload.checkOut = timeStr;
+                    payload.checkOutLocation = addr;
+                }
+
+                await fetch(API_URL_POST, { method: "POST", body: JSON.stringify(payload) });
+                
+                // Fetch fresh data dynamically to update the list without a full page reload
+                await loadAttendance();
+
+            } catch (err) {
+                console.error(err);
+                // Revert buttons if it failed
+                if (actionType === 'checkin') setButtonStates(true, false);
+                if (actionType === 'checkout') setButtonStates(false, true);
+            } finally {
+                document.getElementById("loadingOverlay").classList.add("hidden");
+            }
+        }
+
+        // --- BUTTON EVENT LISTENERS (Instant Visual Feedback) ---
+        document.getElementById("checkinButton").addEventListener("click", () => {
+            setButtonStates(false, true); // Instantly turn Check-In Gray, Check-Out Black
+            submitAttendance("checkin");
+        });
+
+        document.getElementById("checkoutButton").addEventListener("click", () => {
+            setButtonStates(false, false); // Instantly turn both Gray
+            submitAttendance("checkout");
+        });
+
+        async function enableLocation() {
+            closeLocationPopup();
+            if(pendingAction) submitAttendance(pendingAction);
+        }
+
+        // --- INITIAL LOAD ---
         async function loadAttendance() {
             const email = localStorage.getItem("email");
-            
             try {
                 const profileImg = localStorage.getItem("photo");
                 if(profileImg) document.getElementById("profileImage").src = profileImg;
             } catch(e) {}
 
             try {
-                const response = await fetch(API_URL2 + "?email=" + encodeURIComponent(email));
+                const response = await fetch(API_URL_GET + "?email=" + encodeURIComponent(email));
                 const data = await response.json();
                 
-                // Filter user data and flip newest-first
                 const myAttendance = data.filter(r => r["Employee Email"] === email).reverse();
-                
                 renderList(myAttendance);
                 
-                // Check Button States based on today's data
+                // Day Reset Logic (Checks if today has records)
                 let canCheckIn = true;
                 let canCheckOut = false;
 
@@ -265,28 +305,23 @@
 
                     if (todayStr === recordDateStr) {
                         if (latestRecord["Check In"] && !latestRecord["Check Out"]) {
-                            // Checked in today, waiting to Check Out
                             canCheckIn = false;
-                            canCheckOut = true;
+                            canCheckOut = true; // Waiting to check out
                         } else if (latestRecord["Check In"] && latestRecord["Check Out"]) {
-                            // Finished day
                             canCheckIn = false;
-                            canCheckOut = false;
+                            canCheckOut = false; // Finished day, disabled until tomorrow
                         }
                     }
                 }
-                
-                // Apply Initial UI Colors
-                updateButtonUI(canCheckIn, canCheckOut);
+                setButtonStates(canCheckIn, canCheckOut);
 
             } catch (err) {
-                console.error("Failed to load live data", err);
+                console.error("Failed to load data", err);
                 document.getElementById("attendanceList").innerHTML = '<p class="p-4 text-center text-error">Failed to load data.</p>';
             }
         }
         
         loadAttendance();
     </script>
-    <script src="attendance.js"></script>
 </body>
 </html>
