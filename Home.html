@@ -14,13 +14,85 @@
     <meta name="theme-color" content="#f9f9f9">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
 
-    <link rel="stylesheet" href="style.css">
+    <!-- THE INSTANT FIX: Tailwind CDN is back -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-primary": "#c6c6c6",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-surface-variant": "#4c4546",
+                        "primary-fixed": "#e2e2e2",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#e1dfdf",
+                        "tertiary-container": "#1a1c1c",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#474747",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-variant": "#e2e2e2",
+                        "surface-container": "#eeeeee",
+                        "on-primary-fixed": "#1b1b1b",
+                        "secondary-fixed-dim": "#c7c6c6",
+                        "surface": "#f9f9f9",
+                        "surface-container-low": "#f3f3f4",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f9f9f9",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "primary-fixed-dim": "#c6c6c6",
+                        "surface-dim": "#dadada",
+                        "secondary": "#5e5e5e",
+                        "primary": "#000000",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#e4e2e2",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "background": "#f9f9f9",
+                        "on-background": "#1a1c1c",
+                        "outline-variant": "#cfc4c5",
+                        "on-primary-container": "#848484",
+                        "inverse-on-surface": "#f0f1f1",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#838484",
+                        "inverse-surface": "#2f3131",
+                        "outline": "#7e7576",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "surface-tint": "#5e5e5e",
+                        "on-secondary-fixed-variant": "#464747",
+                        "surface-container-highest": "#e2e2e2",
+                        "tertiary": "#000000",
+                        "on-secondary-container": "#626262",
+                        "primary-container": "#1b1b1b"
+                    },
+                    fontFamily: {
+                        "headline-sm": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "headline-xl": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "headline-xl-mobile": ["Hanken Grotesk"]
+                    }
+                }
+            }
+        }
+    </script>
     
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        /* GPU Accelerated Animations for low RAM phones */
+        /* GPU Accelerated Animations */
         .map-pulse {
             animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
             will-change: transform, opacity;
@@ -153,7 +225,6 @@
     }
     loadAttendance();
 
-    // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
