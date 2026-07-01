@@ -131,7 +131,7 @@ const response = await fetch(API_URL,{
             body:JSON.stringify(data)
         });
         const result = await response.text();
-        alert(result); 
+        // alert(result); 
         window.location.reload();
 
     }
@@ -206,7 +206,7 @@ const response = await fetch(API_URL,{
         });
         const result = await response.text();
         
-        alert(result); 
+        // alert(result); 
         window.location.reload();
 
     }
