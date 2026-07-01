@@ -4,7 +4,7 @@ const checkinButton = document.getElementById("checkinButton");
 const checkoutButton = document.getElementById("checkoutButton");
 
 checkinButton.addEventListener("click", checkIn);
-checkoutButton.addEventListener("click", checkOut);
+checkoutButton.addEventListener("click", checkOut);   
 
 function showLocationPopup(message) {
 
@@ -126,19 +126,13 @@ async function checkIn(){
 
         };
 
-        const response = await fetch(API_URL,{
-
+const response = await fetch(API_URL,{
             method:"POST",
-
             body:JSON.stringify(data)
-
         });
-
         const result = await response.text();
-
-        console.log(result);
-
-        await loadAttendance();
+        alert(result); 
+        window.location.reload();
 
     }
 
@@ -206,19 +200,14 @@ attendanceAction = "checkout";
 
             };
 
-        const response = await fetch(API_URL,{
-
+const response = await fetch(API_URL,{
             method:"POST",
-
             body:JSON.stringify(data)
-
         });
-
         const result = await response.text();
-
-        console.log(result);
-
-        await loadAttendance();
+        
+        alert(result); 
+        window.location.reload();
 
     }
 
