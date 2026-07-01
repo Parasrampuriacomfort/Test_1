@@ -50,27 +50,31 @@
         body { background-color: #f9f9f9; color: #1a1c1c; font-family: 'Inter', sans-serif; }
         
         /* Hardware Acceleration for fast tapping */
-        button, a { -webkit-tap-highlight-color: transparent; transform: translateZ(0); }
+        button, a { -webkit-tap-highlight-color: transparent; transform: translateZ(0); will-change: transform; }
         .bento-card { transition: transform 0.15s ease; will-change: transform; }
         .bento-card:active { transform: scale(0.98); }
         
-        /* OVERLAY - Removed Blur for massive performance boost on old phones */
+        /* OVERLAY - Ultra Lightweight */
         .modal-overlay { 
             background-color: rgba(0, 0, 0, 0.6); 
             opacity: 0; 
             pointer-events: none; 
-            transition: opacity 0.2s ease-out; 
+            transition: opacity 0.15s linear; /* Linear is easier on CPU than cubic-bezier */
             will-change: opacity;
+            transform: translateZ(0); /* Force GPU */
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         
-        /* BOTTOM SHEET - GPU Accelerated */
+        /* BOTTOM SHEET - The Ultimate Performance Fix */
         .bottom-sheet { 
-            transform: translateY(100%); 
-            transition: transform 0.25s cubic-bezier(0, 0, 0.2, 1); 
+            /* translate3d uses the GPU's XYZ axes instead of CPU for movement */
+            transform: translate3d(0, 100%, 0); 
+            transition: transform 0.2s ease-out; 
             will-change: transform;
+            /* MAGIC BULLET: Tells browser to NOT calculate outside elements during this animation */
+            contain: content; 
         }
-        .bottom-sheet.active { transform: translateY(0); }
+        .bottom-sheet.active { transform: translate3d(0, 0, 0); }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
@@ -80,6 +84,7 @@
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
+    <!-- TopAppBar -->
     <header class="w-full top-0 sticky z-40 flex items-center justify-between px-margin-mobile h-16 bg-surface border-b border-surface-container">
         <div class="flex items-center gap-stack-md">
             <button class="active:scale-95 transition-transform duration-150">
@@ -93,8 +98,10 @@
     </header>
 
     <main class="flex-1 px-margin-mobile pt-stack-lg pb-48">
+        <!-- Summary Stats Section -->
         <section class="grid grid-cols-2 gap-stack-md mb-stack-lg">
-            <div class="col-span-2 bg-surface-container-lowest p-stack-md rounded-xl shadow-[0_8px_16px_0_rgba(0,0,0,0.03)] border border-surface-container flex flex-col gap-stack-md bento-card">
+            <!-- Switched heavy shadow to light border -->
+            <div class="col-span-2 bg-surface-container-lowest p-stack-md rounded-xl border border-surface-container flex flex-col gap-stack-md bento-card">
                 <div class="flex justify-between items-center">
                     <div class="flex flex-col"><div class="flex items-baseline gap-1"></div></div>
                     <span class="font-label-md text-label-md text-primary">October 2026</span>
@@ -146,13 +153,15 @@
             </div>
         </section>
 
+        <!-- Leave Status Tabs/Overview -->
         <div class="flex items-center justify-between mb-stack-md">
             <h2 class="font-headline-sm text-headline-sm text-primary">Recent History</h2>
             <button class="font-label-md text-label-md text-secondary hover:text-primary transition-colors">View All</button>
         </div>
         
         <div class="space-y-stack-md">
-            <div class="bg-surface-container-lowest p-stack-md rounded-xl shadow-[0_8px_16px_0_rgba(0,0,0,0.03)] border border-surface-container flex flex-col gap-stack-sm bento-card">
+            <!-- Pending Card -->
+            <div class="bg-surface-container-lowest p-stack-md rounded-xl border border-surface-container flex flex-col gap-stack-sm bento-card">
                 <div class="flex justify-between items-start">
                     <div class="flex flex-col">
                         <span class="font-headline-sm text-headline-sm text-primary">Sick Leave</span>
@@ -164,7 +173,8 @@
                 </div>
                 <p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 italic">"Recovering from seasonal flu..."</p>
             </div>
-            <div class="bg-surface-container-lowest p-stack-md rounded-xl shadow-[0_8px_16px_0_rgba(0,0,0,0.03)] border border-surface-container flex flex-col gap-stack-sm bento-card">
+            <!-- Approved Card -->
+            <div class="bg-surface-container-lowest p-stack-md rounded-xl border border-surface-container flex flex-col gap-stack-sm bento-card">
                 <div class="flex justify-between items-start">
                     <div class="flex flex-col">
                         <span class="font-headline-sm text-headline-sm text-primary">Annual Leave</span>
@@ -179,13 +189,15 @@
         </div>
     </main>
 
+    <!-- Bottom Actions & Navigation Shell -->
     <div class="fixed bottom-0 left-0 w-full z-50 pointer-events-none">
         <div class="px-margin-mobile mb-4 pointer-events-auto">
-            <button class="w-full bg-primary text-on-primary h-14 rounded-xl font-headline-sm text-headline-sm shadow-md flex items-center justify-center gap-2 active:scale-95 transition-transform duration-150" id="openLeaveForm">
+            <!-- Removed heavy shadow, replaced with lightweight background adjustment -->
+            <button class="w-full bg-primary text-on-primary h-14 rounded-xl font-headline-sm text-headline-sm flex items-center justify-center gap-2 active:scale-95 transition-transform duration-150" id="openLeaveForm">
                 <span class="material-symbols-outlined">add</span>Apply for Leave
             </button>
         </div>
-        <nav class="w-full flex justify-around items-center px-4 py-3 bg-surface border-t border-surface-container shadow-[0_-4px_20px_0_rgba(0,0,0,0.04)] pointer-events-auto">
+        <nav class="w-full flex justify-around items-center px-4 py-3 bg-surface border-t border-surface-container pointer-events-auto">
             <button onclick="window.location.replace('Home.html')" class="flex flex-col items-center justify-center text-on-surface-variant px-6 py-2 hover:bg-surface-container-high transition-colors active:scale-90 duration-150">
                 <span class="material-symbols-outlined">fingerprint</span>
                 <span class="font-label-md text-label-md">Attendance</span>
@@ -197,9 +209,12 @@
         </nav>
     </div>
 
+    <!-- Modal Overlay -->
     <div class="modal-overlay fixed inset-0 z-[60]" id="modalOverlay"></div>
     
-    <div class="bottom-sheet fixed bottom-0 left-0 w-full bg-surface-container-lowest rounded-t-[2rem] z-[70] shadow-2xl p-margin-mobile overflow-y-auto max-h-[90vh] no-scrollbar" id="leaveSheet">
+    <!-- Leave Application Bottom Sheet -->
+    <!-- Removed shadow-2xl and added border-t to completely free up GPU -->
+    <div class="bottom-sheet fixed bottom-0 left-0 w-full bg-surface-container-lowest rounded-t-[2rem] border-t border-surface-container z-[70] p-margin-mobile overflow-y-auto max-h-[90vh] no-scrollbar" id="leaveSheet">
         <div class="w-12 h-1 bg-surface-container-highest rounded-full mx-auto mb-stack-lg"></div>
         <header class="flex justify-between items-center mb-stack-lg">
             <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Apply Leave</h2>
@@ -246,13 +261,12 @@
             
             <div class="grid grid-cols-2 gap-stack-md mb-10">
                 <button class="w-full border border-outline-variant text-primary h-14 rounded-xl font-headline-sm text-headline-sm active:scale-95 transition-transform duration-150" id="cancelLeaveForm" type="button">Cancel</button>
-                <button class="w-full bg-primary text-on-primary h-14 rounded-xl font-headline-sm text-headline-sm shadow-md active:scale-95 transition-transform duration-150" type="submit">Save</button>
+                <button class="w-full bg-primary text-on-primary h-14 rounded-xl font-headline-sm text-headline-sm active:scale-95 transition-transform duration-150" type="submit">Save</button>
             </div>
         </form>
     </div>
 
     <script>
-        // Set Profile Image securely
         try {
             const profileImgUrl = localStorage.getItem("photo");
             if(profileImgUrl) document.getElementById("leaveProfileImg").src = profileImgUrl;
@@ -263,16 +277,20 @@
         const toDateContainer = document.getElementById('toDateContainer');
         const durationToggles = document.querySelectorAll('.duration-toggle');
 
-        // Force hardware acceleration before animating to prevent initial stutter
         const toggleModal = (show) => {
             if(show) {
-                overlay.classList.add('active');
-                sheet.classList.add('active');
-                document.body.style.overflow = 'hidden';
+                // Request animation frame ensures browser is ready to paint before adding class
+                requestAnimationFrame(() => {
+                    overlay.classList.add('active');
+                    sheet.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
             } else {
-                overlay.classList.remove('active');
-                sheet.classList.remove('active');
-                document.body.style.overflow = '';
+                requestAnimationFrame(() => {
+                    overlay.classList.remove('active');
+                    sheet.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
             }
         };
 
@@ -287,7 +305,6 @@
             toggleModal(false);
         });
 
-        // Fast Event delegation for toggles
         document.getElementById('durationContainer').addEventListener('click', (e) => {
             const toggle = e.target.closest('.duration-toggle');
             if (!toggle) return;
@@ -300,7 +317,6 @@
             
             toggle.className = "duration-toggle active bg-primary text-on-primary border border-primary py-2 rounded-lg font-label-md text-label-md transition-colors";
             
-            // Toggle Display (Instant, 0 lag)
             if (type === 'full') {
                 toDateContainer.classList.remove('hidden-field');
             } else {
