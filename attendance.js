@@ -1,5 +1,5 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzJLFvsWpAr3VsNOOUR_uDqDaIC8p_hwbdnUWdmPbRrZYfIq3rGVceW0PKAd8jIb48I/exec";
-const API_URL_GET = "https://script.google.com/macros/s/AKfycbzJLFvsWpAr3VsNOOUR_uDqDaIC8p_hwbdnUWdmPbRrZYfIq3rGVceW0PKAd8jIb48I/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbya3Rq7zL3zTWCDaF5T1OCKz0BrsA2IPLB3mz826_ngcgowRgHY_rVkaS8YZDwvBNcA/exec";
+const API_URL_GET = "https://script.google.com/macros/s/AKfycbya3Rq7zL3zTWCDaF5T1OCKz0BrsA2IPLB3mz826_ngcgowRgHY_rVkaS8YZDwvBNcA/exec";
 
 const checkinButton = document.getElementById("checkinButton");
 const checkoutButton = document.getElementById("checkoutButton");
