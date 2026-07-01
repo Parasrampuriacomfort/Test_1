@@ -1,122 +1,29 @@
-<!DOCTYPE html><html lang="en" style=""><head>
-
-    <script >if(localStorage.getItem("loggedIn") !== "true"){
-
-    window.location.href="index.html";
-
-}</script>
-    <meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Presence - Attendance</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-
-                    
-                    "colors": {
-                        "inverse-primary": "#c6c6c6",
-                        "tertiary-fixed-dim": "#c6c6c7",
-                        "on-surface-variant": "#4c4546",
-                        "primary-fixed": "#e2e2e2",
-                        "on-tertiary-fixed": "#1a1c1c",
-                        "on-secondary": "#ffffff",
-                        "on-error-container": "#93000a",
-                        "secondary-container": "#e1dfdf",
-                        "tertiary-container": "#1a1c1c",
-                        "tertiary-fixed": "#e2e2e2",
-                        "surface-container-lowest": "#ffffff",
-                        "on-primary-fixed-variant": "#474747",
-                        "surface-container-high": "#e8e8e8",
-                        "surface-variant": "#e2e2e2",
-                        "surface-container": "#eeeeee",
-                        "on-primary-fixed": "#1b1b1b",
-                        "secondary-fixed-dim": "#c7c6c6",
-                        "surface": "#f9f9f9",
-                        "surface-container-low": "#f3f3f4",
-                        "error": "#ba1a1a",
-                        "surface-bright": "#f9f9f9",
-                        "error-container": "#ffdad6",
-                        "on-tertiary": "#ffffff",
-                        "on-surface": "#1a1c1c",
-                        "primary-fixed-dim": "#c6c6c6",
-                        "surface-dim": "#dadada",
-                        "secondary": "#5e5e5e",
-                        "primary": "#000000",
-                        "on-error": "#ffffff",
-                        "secondary-fixed": "#e4e2e2",
-                        "on-secondary-fixed": "#1b1c1c",
-                        "background": "#f9f9f9",
-                        "on-background": "#1a1c1c",
-                        "outline-variant": "#cfc4c5",
-                        "on-primary-container": "#848484",
-                        "inverse-on-surface": "#f0f1f1",
-                        "on-primary": "#ffffff",
-                        "on-tertiary-container": "#838484",
-                        "inverse-surface": "#2f3131",
-                        "outline": "#7e7576",
-                        "on-tertiary-fixed-variant": "#454747",
-                        "surface-tint": "#5e5e5e",
-                        "on-secondary-fixed-variant": "#464747",
-                        "surface-container-highest": "#e2e2e2",
-                        "tertiary": "#000000",
-                        "on-secondary-container": "#626262",
-                        "primary-container": "#1b1b1b"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.125rem",
-                        "lg": "0.25rem",
-                        "xl": "0.5rem",
-                        "full": "0.75rem"
-                    },
-                    "spacing": {
-                        "margin-desktop": "40px",
-                        "stack-sm": "8px",
-                        "unit": "4px",
-                        "stack-md": "16px",
-                        "margin-mobile": "20px",
-                        "gutter": "16px",
-                        "stack-lg": "32px",
-                        "container-padding": "24px"
-                    },
-                    "fontFamily": {
-                        "headline-sm": ["Hanken Grotesk"],
-                        "body-md": ["Inter"],
-                        "body-lg": ["Inter"],
-                        "label-md": ["Inter"],
-                        "body-sm": ["Inter"],
-                        "headline-lg": ["Hanken Grotesk"],
-                        "label-sm": ["Inter"],
-                        "headline-md": ["Hanken Grotesk"],
-                        "headline-xl": ["Hanken Grotesk"],
-                        "headline-lg-mobile": ["Hanken Grotesk"],
-                        "headline-xl-mobile": ["Hanken Grotesk"]
-                    },
-                    "fontSize": {
-                        "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
-                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
-                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
-                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
-                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
-                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }],
-                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
-                        "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
-                        "headline-lg-mobile": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
-                        "headline-xl-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }]
-                    }
-                }
-            }
+<!DOCTYPE html>
+<html lang="en" style="">
+<head>
+    <script>
+        if(localStorage.getItem("loggedIn") !== "true"){
+            window.location.href="index.html";
         }
     </script>
-<style>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    
+    <title>Presence - Attendance</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f9f9f9">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+
+    <link rel="stylesheet" href="style.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* GPU Accelerated Animations for low RAM phones */
         .map-pulse {
             animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+            will-change: transform, opacity;
         }
         @keyframes pulse-ring {
             0% { transform: scale(0.8); opacity: 0.5; }
@@ -125,258 +32,136 @@
         .ambient-shadow-level-2 {
             box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.05);
         }
-
-.loader{
-
-    width:42px;
-    height:42px;
-
-    border:4px solid #e5e7eb;
-
-    border-top:4px solid black;
-
-    border-radius:50%;
-
-    animation:spin .8s linear infinite;
-
-}
-
-@keyframes spin{
-
-    from{
-
-        transform:rotate(0deg);
-
-    }
-
-    to{
-
-        transform:rotate(360deg);
-
-    }
-
-}
+        .loader {
+            width: 42px;
+            height: 42px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid black;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            will-change: transform;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
-
-    
 </head>
 
-<body 
-class="bg-surface text-on-surface font-body-md min-h-screen pb-24 selection:bg-surface-container-highest selection:text-primary">
+<body class="bg-surface text-on-surface font-body-md min-h-screen pb-24 selection:bg-surface-container-highest selection:text-primary">
 
-<div id="loadingOverlay"
-class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-
+<div id="loadingOverlay" class="fixed inset-0 bg-white/95 flex items-center justify-center z-50 hidden">
     <div class="bg-white rounded-2xl shadow-xl px-8 py-6 text-center">
-
         <div class="loader mx-auto mb-4"></div>
-
-        <h2 id="loadingTitle" class="text-lg font-semibold">
-            Checking In...
-        </h2>
-
-        <p class="text-gray-500 text-sm mt-2">
-            Please wait a moment
-        </p>
-
+        <h2 id="loadingTitle" class="text-lg font-semibold">Checking In...</h2>
+        <p class="text-gray-500 text-sm mt-2">Please wait a moment</p>
     </div>
-
 </div>
 
-<div id="locationPopup"
-     class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-
+<div id="locationPopup" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
     <div class="bg-white rounded-xl p-6 w-80 text-center">
-
-        <h2 class="text-xl font-bold mb-3">
-            Enable Location
-        </h2>
-
-        <p id="locationPopupText" class="text-gray-600 mb-5">
-            Location is required.
-        </p>
-
-        <button
-            onclick="enableLocation()"
-            class="w-full bg-black text-white py-3 rounded-lg">
-            Enable Location
-        </button>
-
-        <button
-            onclick="closeLocationPopup()"
-            class="mt-3 text-gray-500">
-            Cancel
-        </button>
-
+        <h2 class="text-xl font-bold mb-3">Enable Location</h2>
+        <p id="locationPopupText" class="text-gray-600 mb-5">Location is required.</p>
+        <button onclick="enableLocation()" class="w-full bg-black text-white py-3 rounded-lg">Enable Location</button>
+        <button onclick="closeLocationPopup()" class="mt-3 text-gray-500">Cancel</button>
     </div>
-
 </div>
-<!-- TopAppBar -->
+
 <header class="w-full top-0 sticky z-40 bg-surface dark:bg-surface-dim border-b border-surface-container flex items-center justify-between px-margin-mobile h-16 w-full">
-<button class="text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-150 p-2 -ml-2 rounded-full">
-<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 0;">menu</span>
-</button>
-<h1 class="text-headline-lg-mobile font-headline-lg-mobile tracking-tight text-primary dark:text-primary-fixed">
-            Presence
-        </h1>
-<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-150 p-1 -mr-1 rounded-full border border-surface-container overflow-hidden w-8 h-8 flex items-center justify-center bg-surface-container-low">
-<img alt="User profile photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtcOZCl3_wwHw5sgUG-pSonf2rfjC0XmgfM6YZWrApqE1OsSBnP93eGeSfFGYUEWLX6GkXuRn942XY7ahobSLVNkts8T16HnJX1DmwxN3GDgdBBwqcCkCJ6m1Q7Cr0feTmpYDy_nX9fPDCPaRNqTBjh0XQ9p85uqlspWIzDGqT6JK92Fk7x1OaQ5KGkcFEaIXvkWJNs0hbT7_mzOhgxa3x47lorBaPKSJQuVA14D0ffgrw34tt-SVo6Dp1biFuoFzJluR90fqD7g">
-</button>
+    <button class="text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-150 p-2 -ml-2 rounded-full">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+    </button>
+    <h1 class="text-headline-lg-mobile font-headline-lg-mobile tracking-tight text-primary dark:text-primary-fixed">Presence</h1>
+    <button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-150 p-1 -mr-1 rounded-full border border-surface-container overflow-hidden w-8 h-8 flex items-center justify-center bg-surface-container-low">
+        <img alt="User profile photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtcOZCl3_wwHw5sgUG-pSonf2rfjC0XmgfM6YZWrApqE1OsSBnP93eGeSfFGYUEWLX6GkXuRn942XY7ahobSLVNkts8T16HnJX1DmwxN3GDgdBBwqcCkCJ6m1Q7Cr0feTmpYDy_nX9fPDCPaRNqTBjh0XQ9p85uqlspWIzDGqT6JK92Fk7x1OaQ5KGkcFEaIXvkWJNs0hbT7_mzOhgxa3x47lorBaPKSJQuVA14D0ffgrw34tt-SVo6Dp1biFuoFzJluR90fqD7g">
+    </button>
 </header>
+
 <main class="px-margin-mobile py-stack-lg max-w-2xl mx-auto flex flex-col gap-stack-lg">
-<!-- Hero Section: Check In / Out -->
-<section class="flex flex-col gap-stack-md">
-<div class="grid grid-cols-2 gap-gutter">
-<button id = "checkinButton" class="bg-primary text-on-primary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-opacity-90 active:scale-[0.98] transition-all ambient-shadow-level-2 h-32">
-<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: &quot;FILL&quot; 1;">login</span>
-<span class="font-headline-sm text-headline-sm">Check In</span>
-</button>
-<button id="checkoutButton" class="bg-surface-container-lowest border border-outline-variant text-primary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-surface-container-low active:scale-[0.98] transition-all h-32">
-<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: &quot;FILL&quot; 0;">logout</span>
-<span class="font-headline-sm text-headline-sm">Check Out</span>
-</button>
+    <section class="flex flex-col gap-stack-md">
+        <div class="grid grid-cols-2 gap-gutter">
+            <button id="checkinButton" class="bg-primary text-on-primary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-opacity-90 active:scale-[0.98] transition-all ambient-shadow-level-2 h-32">
+                <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">login</span>
+                <span class="font-headline-sm text-headline-sm">Check In</span>
+            </button>
+            <button id="checkoutButton" class="bg-surface-container-lowest border border-outline-variant text-primary py-4 px-6 rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-surface-container-low active:scale-[0.98] transition-all h-32">
+                <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 0;">logout</span>
+                <span class="font-headline-sm text-headline-sm">Check Out</span>
+            </button>
+        </div>
+        <div class="text-center">
+            <span id="locationMessage" class="font-body-sm text-body-sm text-secondary">Location Must Be Enable 📍</span>
+        </div>
+    </section>
 
-</div>
-
-<div class="text-center">
-    
-<span id="locationMessage" class="font-body-sm text-body-sm text-secondary">Location Must Be Enable 📍</span>
-</div>
-</section>
-<!-- Live Location Map Box -->
-<section class="flex flex-col gap-stack-md">
-<div class="flex items-center justify-between">
-
-
-</div>
-
-</section>
-<!-- Recent Activity -->
-<section class="flex flex-col gap-stack-sm">
-<h2 class="font-headline-md text-headline-md mb-2">Recent Activity</h2>
-<div class="bg-surface-container-lowest rounded-lg border border-surface-container ambient-shadow-level-2">
-<!-- Item 1 -->
-<div id="attendanceList"></div>
-
-</div>
-<button class="mt-2 text-center text-secondary font-label-md text-label-md hover:text-primary py-2">View all history</button>
-</section>
+    <section class="flex flex-col gap-stack-sm">
+        <h2 class="font-headline-md text-headline-md mb-2">Recent Activity</h2>
+        <div class="bg-surface-container-lowest rounded-lg border border-surface-container ambient-shadow-level-2">
+            <div id="attendanceList"></div>
+        </div>
+        <button class="mt-2 text-center text-secondary font-label-md text-label-md hover:text-primary py-2">View all history</button>
+    </section>
 </main>
-<!-- BottomNavBar -->
+
 <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface dark:bg-surface-container-low border-t border-surface-container shadow-[0_-4px_20px_0_rgba(0,0,0,0.04)] z-50">
-
-    <!-- Attendance Button -->
-    <button
-        onclick="window.location.href='Home.html'"
-        class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed bg-secondary-container dark:bg-tertiary-container rounded-full px-6 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-all duration-200">
-
+    <button onclick="window.location.href='Home.html'" class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed bg-secondary-container dark:bg-tertiary-container rounded-full px-6 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-all duration-200">
         <span class="material-symbols-outlined mb-1" style="font-variation-settings:'FILL' 1;">fingerprint</span>
         <span class="font-label-md text-label-md">Attendance</span>
     </button>
-
-    <!-- Leave Button -->
-    <button
-        onclick="window.location.href='Leave.html'"
-        class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-secondary-fixed-variant px-6 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-all duration-200">
-
+    <button onclick="window.location.href='Leave.html'" class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-secondary-fixed-variant px-6 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-all duration-200">
         <span class="material-symbols-outlined mb-1" style="font-variation-settings:'FILL' 0;">event_busy</span>
         <span class="font-label-md text-label-md">Leave</span>
     </button>
-
 </nav>
 
-
-
 <script>
-const name = localStorage.getItem("name");
+    const name = localStorage.getItem("name");
+    const API_URL2 = "https://script.google.com/macros/s/AKfycbyJ81-WCQupQpdtmUlrgQdtMbcmgBES6ESVof1fXuqdLwZ1Cr3ghZCaKrFh3ig42hdh/exec";
 
-const API_URL2 = "https://script.google.com/macros/s/AKfycbyJ81-WCQupQpdtmUlrgQdtMbcmgBES6ESVof1fXuqdLwZ1Cr3ghZCaKrFh3ig42hdh/exec";
-
-async function loadAttendance() {
-
-const email = localStorage.getItem("email");
-
-const response = await fetch(
-    API_URL2 + "?email=" + encodeURIComponent(email)
-);
-    const data = await response.json();
-
-    const list = document.getElementById("attendanceList");
-    list.innerHTML = "";
-
-    // Logged in user's email
-    const currentUserEmail = localStorage.getItem("email");
-
-    // Only this user's attendance
-    const myAttendance = data.filter(record =>
-        record["Employee Email"] === currentUserEmail
-    );
-
-    // Latest first
-    data.reverse();
-
-    data.forEach(record => {
-
-        list.innerHTML += `
-        <div class="flex items-center justify-between p-4 border-b border-surface-container hover:bg-surface-container-low transition-colors">
-
-            <div class="flex items-center gap-3">
-
-                <div class="w-10 h-10 bg-surface-container rounded flex items-center justify-center text-primary">
-
-                    <span class="material-symbols-outlined"
-                    style="font-variation-settings:'FILL' 1;">
-                        login
-                    </span>
-
+    async function loadAttendance() {
+        const email = localStorage.getItem("email");
+        const response = await fetch(API_URL2 + "?email=" + encodeURIComponent(email));
+        const data = await response.json();
+        const list = document.getElementById("attendanceList");
+        list.innerHTML = "";
+        
+        const currentUserEmail = localStorage.getItem("email");
+        const myAttendance = data.filter(record => record["Employee Email"] === currentUserEmail);
+        
+        data.reverse();
+        data.forEach(record => {
+            list.innerHTML += `
+            <div class="flex items-center justify-between p-4 border-b border-surface-container hover:bg-surface-container-low transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-surface-container rounded flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">login</span>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">${new Date(record.Date).toLocaleDateString("en-IN")}</h3>
+                        <p class="text-sm text-gray-500">
+                            ${record["Check In"] ? new Date(record["Check In"]).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"}) : "--:--"}
+                            →
+                            ${record["Check Out"] ? new Date(record["Check Out"]).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"}) : "--:--"}
+                        </p>
+                    </div>
                 </div>
-
-                <div>
-
-                    <h3 class="font-medium">
-                        ${new Date(record.Date).toLocaleDateString("en-IN")}
-                    </h3>
-
-                    <p class="text-sm text-gray-500">
-
-                        ${record["Check In"] ? new Date(record["Check In"]).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit"
-                        }) : "--:--"}
-
-                        →
-
-                        ${record["Check Out"] ? new Date(record["Check Out"]).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit"
-                        }) : "--:--"}
-
-                    </p>
-
+                <div class="text-right">
+                    <span class="text-sm text-gray-500">${data[0]["Total Working Hours"]}</span>
                 </div>
+            </div>`;
+        });
+    }
+    loadAttendance();
 
-            </div>
-
-
-            <div class="text-right">
-
-                <span class="text-sm text-gray-500">
-
-                    ${data[0]["Total Working Hours"]}
-
-                </span>
-
-            </div>
-
-        </div>
-        `;
-
-    });
-
-}
-loadAttendance();
-
-
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then((registration) => console.log('ServiceWorker registered'))
+                .catch((error) => console.log('ServiceWorker failed: ', error));
+        });
+    }
 </script>
 <script src="attendance.js"></script>
-</body></html>
+</body>
+</html>
