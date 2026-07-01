@@ -1,301 +1,145 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbyke_kVVkFvk-gLHZUKKHaicgJY2sJ0_ppbgq8kv7b1DK7xpTnYjQVF-Q7CD--5oTmk/exec";
 
-const checkinButton = document.getElementById("checkinButton");
-const checkoutButton = document.getElementById("checkoutButton");
+// Cache DOM elements to prevent repeated slow lookups on old phones
+const els = {
+    checkinBtn: document.getElementById("checkinButton"),
+    checkoutBtn: document.getElementById("checkoutButton"),
+    locPopup: document.getElementById("locationPopup"),
+    locPopupText: document.getElementById("locationPopupText"),
+    loadOverlay: document.getElementById("loadingOverlay"),
+    loadTitle: document.getElementById("loadingTitle")
+};
 
-checkinButton.addEventListener("click", checkIn);
-checkoutButton.addEventListener("click", checkOut);   
+let attendanceAction = "";
+
+if (els.checkinBtn) els.checkinBtn.addEventListener("click", () => checkIn());
+if (els.checkoutBtn) els.checkoutBtn.addEventListener("click", () => checkOut());
 
 function showLocationPopup(message) {
-
-    document.getElementById("locationPopupText").innerText = message;
-
-    document.getElementById("locationPopup").classList.remove("hidden");
-
+    els.locPopupText.innerText = message;
+    els.locPopup.classList.remove("hidden");
 }
 
 function closeLocationPopup() {
-
-    document.getElementById("locationPopup").classList.add("hidden");
-
+    els.locPopup.classList.add("hidden");
 }
+
 async function enableLocation() {
-
     closeLocationPopup();
-
     navigator.geolocation.getCurrentPosition(
-
-        async function(position){
-
-            if(attendanceAction === "checkin"){
-
-                await checkIn();
-
-            }
-            else if(attendanceAction === "checkout"){
-
-                await checkOut();
-
-            }
-
+        async function() {
+            if (attendanceAction === "checkin") await checkIn();
+            else if (attendanceAction === "checkout") await checkOut();
         },
-
-        function(){
-
-            alert("Please enable Location in your phone settings.");
-
-        },
-
-        {
-            enableHighAccuracy:true
-        }
-
+        function() { alert("Please enable Location in your phone settings."); },
+        { enableHighAccuracy: true }
     );
-
 }
 
-
-function showLoading(title){
-
-    document.getElementById("loadingTitle").innerText = title;
-
-    document.getElementById("loadingOverlay").classList.remove("hidden");
-
+function showLoading(title) {
+    els.loadTitle.innerText = title;
+    els.loadOverlay.classList.remove("hidden");
 }
 
-function hideLoading(){
-
-    document.getElementById("loadingOverlay").classList.add("hidden");
-
+function hideLoading() {
+    els.loadOverlay.classList.add("hidden");
 }
 
-async function checkIn(){
+function getCurrentTime() {
+    const now = new Date();
+    return {
+        date: now.toISOString().split("T")[0],
+        time: now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+    };
+}
 
+async function checkIn() {
     attendanceAction = "checkin";
-
-    checkinButton.disabled = true;
-
+    els.checkinBtn.disabled = true;
     showLoading("Checking In...");
 
-    try{
-
+    try {
         const location = await getLocation();
-
-        const address = await getAddress(
-            location.latitude,
-            location.longitude
-        );
-
-        const now = new Date();
-
-        const employeeName = localStorage.getItem("name");
-
-        const employeeEmail = localStorage.getItem("email");
-
-        const date = now.toISOString().split("T")[0];
-
-        const time = now.toLocaleTimeString("en-IN",{
-
-            hour:"2-digit",
-
-            minute:"2-digit"
-
-        });
-
-
+        const address = await getAddress(location.latitude, location.longitude);
+        const dt = getCurrentTime();
         
-        const recordId =
+        const employeeEmail = localStorage.getItem("email");
+        const recordId = employeeEmail + "_" + dt.date.replaceAll("-", "");
 
-            employeeEmail + "_" + date.replaceAll("-","");
-
-        const data={
-
-            action:"checkin",
-
+        const data = {
+            action: "checkin",
             recordId,
-
-            employeeName,
-
+            employeeName: localStorage.getItem("name"),
             employeeEmail,
-
-            date,
-
-            checkIn:time,
-
-            checkInLocation:address
-
+            date: dt.date,
+            checkIn: dt.time,
+            checkInLocation: address
         };
 
-const response = await fetch(API_URL,{
-            method:"POST",
-            body:JSON.stringify(data)
-        });
-        const result = await response.text();
-        // alert(result); 
-        window.location.reload();
-
-    }
-
-    catch(error){
-
+        await fetch(API_URL, { method: "POST", body: JSON.stringify(data) });
+        window.location.reload(); // Reload handles fresh UI mapping
+    } catch (error) {
         console.error(error);
-
-        alert("Unable to Check In");
-
-    }
-
-    finally{
-
+    } finally {
         hideLoading();
-
-        checkinButton.disabled = false;
-
+        els.checkinBtn.disabled = false;
     }
-
 }
 
-
-async function checkOut(){
-attendanceAction = "checkout";
-    checkoutButton.disabled = true;
-
+async function checkOut() {
+    attendanceAction = "checkout";
+    els.checkoutBtn.disabled = true;
     showLoading("Checking Out...");
 
-    try{
-
+    try {
         const location = await getLocation();
-
-        const address = await getAddress(
-            location.latitude,
-            location.longitude
-        );
-
-        const now = new Date();
-
-        const employeeEmail = localStorage.getItem("email");
-
-        const date = now.toISOString().split("T")[0];
-
-        const time = now.toLocaleTimeString("en-IN",{
-
-            hour:"2-digit",
-
-            minute:"2-digit"
-
-        });
-
-        const recordId =
-
-            employeeEmail + "_" + date.replaceAll("-","");
-
-            const data={
-
-                action:"checkout",
-
-                recordId,
-
-                checkOut:time,
-
-                checkOutLocation:address
-
-            };
-
-const response = await fetch(API_URL,{
-            method:"POST",
-            body:JSON.stringify(data)
-        });
-        const result = await response.text();
+        const address = await getAddress(location.latitude, location.longitude);
+        const dt = getCurrentTime();
         
-        // alert(result); 
+        const employeeEmail = localStorage.getItem("email");
+        const recordId = employeeEmail + "_" + dt.date.replaceAll("-", "");
+
+        const data = {
+            action: "checkout",
+            recordId,
+            checkOut: dt.time,
+            checkOutLocation: address
+        };
+
+        await fetch(API_URL, { method: "POST", body: JSON.stringify(data) });
         window.location.reload();
-
-    }
-
-    catch(error){
-
+    } catch (error) {
         console.error(error);
-
-        alert("Unable to Check Out");
-
-    }
-
-    finally{
-
+    } finally {
         hideLoading();
-
-        checkoutButton.disabled = false;
-
+        els.checkoutBtn.disabled = false;
     }
-
 }
 
 async function getLocation() {
     return new Promise((resolve, reject) => {
-
-        if (!navigator.geolocation) {
-            return reject("Geolocation is not supported.");
-        }
-
+        if (!navigator.geolocation) return reject("Geolocation is not supported.");
+        
         navigator.geolocation.getCurrentPosition(
-
-            (position) => {
-
-                resolve({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude
-                });
-
-            },
-
+            (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
             (error) => {
-
-                if (error.code === error.PERMISSION_DENIED) {
-
-                    showLocationPopup(
-                        "Location permission is required to mark attendance."
-                    );
-
-                } else if (error.code === error.POSITION_UNAVAILABLE) {
-
-                    showLocationPopup(
-                        "Location is turned OFF. Please enable GPS."
-                    );
-
-                } else if (error.code === error.TIMEOUT) {
-
-                    showLocationPopup(
-                        "Unable to get your location."
-                    );
-
-                }
-
+                if (error.code === error.PERMISSION_DENIED) showLocationPopup("Location permission is required to mark attendance.");
+                else if (error.code === error.POSITION_UNAVAILABLE) showLocationPopup("Location is turned OFF. Please enable GPS.");
+                else if (error.code === error.TIMEOUT) showLocationPopup("Unable to get your location.");
                 reject(error);
-
             },
-
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            }
-
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
-
     });
 }
 
-async function getAddress(latitude,longitude){
-
-    const response = await fetch(
-
-`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-
-    );
-
-    const data = await response.json();
-
-    const a = data.address;
-
-    return `${a.suburb || ""}, ${a.city || a.town || ""}, ${a.state || ""}`;
-
+async function getAddress(latitude, longitude) {
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const data = await response.json();
+        const a = data.address;
+        return `${a.suburb || ""}, ${a.city || a.town || ""}, ${a.state || ""}`.replace(/^, /, '');
+    } catch (e) {
+        return "Location unknown";
+    }
 }
