@@ -114,24 +114,24 @@
 
     <!-- BottomNavBar -->
 <!-- Bottom Navigation -->
-<nav class="w-full flex justify-around items-center px-4 py-3 bg-surface border-t border-surface-container shadow-[0_-4px_20px_0_rgba(0,0,0,0.04)] pointer-events-auto">
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface dark:bg-surface-container-low border-t border-surface-container shadow-[0_-4px_20px_0_rgba(0,0,0,0.04)] z-50 md:hidden">
 
-    <!-- Attendance -->
+    <!-- Attendance Button -->
     <button
         onclick="window.location.href='Home.html'"
-        class="flex flex-col items-center justify-center text-on-surface-variant px-6 py-2 hover:bg-surface-container-high transition-colors active:scale-90 duration-200">
+        class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed bg-secondary-container dark:bg-tertiary-container rounded-full px-6 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-all duration-200">
 
-        <span class="material-symbols-outlined">fingerprint</span>
+        <span class="material-symbols-outlined mb-1" style="font-variation-settings:'FILL' 1;">fingerprint</span>
         <span class="font-label-md text-label-md">Attendance</span>
     </button>
 
-    <!-- Leave (Current Page) -->
+    <!-- Leave Button -->
     <button
-        onclick="window.location.href='FMS.html'"
-        class="flex flex-col items-center justify-center text-primary bg-secondary-container rounded-full px-6 py-2 active:scale-90 transition-all duration-200">
+        onclick="window.location.href='Leave.html'"
+        class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-secondary-fixed-variant px-6 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-all duration-200">
 
-        <span class="font-variation-settings:'FILL' 1;">local_shipping</span>
-        <span class="font-label-md text-label-md">FMS</span>
+        <span class="material-symbols-outlined mb-1" style="font-variation-settings:'FILL' 0;">event_busy</span>
+        <span class="font-label-md text-label-md">Leave</span>
     </button>
 
 </nav>
