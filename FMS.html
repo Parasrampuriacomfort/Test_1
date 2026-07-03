@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Presence FMS - Orders</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+
+    
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+
+                    
+                    "colors": {
+                        
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#c6c6c6",
+                        "on-secondary-container": "#626262",
+                        "on-background": "#1a1c1c",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "primary-fixed": "#e2e2e2",
+                        "on-primary-fixed": "#1b1b1b",
+                        "primary": "#000000",
+                        "outline-variant": "#cfc4c5",
+                        "outline": "#7e7576",
+                        "background": "#f9f9f9",
+                        "on-secondary-fixed-variant": "#464747",
+                        "surface-container-highest": "#e2e2e2",
+                        "secondary-container": "#e1dfdf",
+                        "surface": "#f9f9f9",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-dim": "#dadada",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#474747",
+                        "surface-tint": "#5e5e5e",
+                        "secondary": "#5e5e5e",
+                        "primary-container": "#1b1b1b",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "surface-variant": "#e2e2e2",
+                        "surface-container-high": "#e8e8e8",
+                        "inverse-on-surface": "#f0f1f1",
+                        "primary-fixed-dim": "#c6c6c6",
+                        "tertiary-fixed": "#e2e2e2",
+                        "tertiary-container": "#1a1c1c",
+                        "on-surface-variant": "#4c4546",
+                        "surface-bright": "#f9f9f9",
+                        "surface-container-low": "#f3f3f4",
+                        "tertiary": "#000000",
+                        "secondary-fixed": "#e4e2e2",
+                        "secondary-fixed-dim": "#c7c6c6",
+                        "on-surface": "#1a1c1c",
+                        "on-primary-container": "#848484",
+                        "inverse-surface": "#2f3131",
+                        "on-tertiary-container": "#838484",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "container-padding": "24px",
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "margin-mobile": "20px",
+                        "stack-sm": "8px",
+                        "margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "headline-xl-mobile": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-xl": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "headline-sm": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-xl-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .step-transition { transition: all 0.3s ease-in-out; }
+    </style>
+</head>
+
+<!-- Global Loading Overlay -->
+<div id="loadingOverlay"
+     class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-[9999] transition-opacity duration-300">
+
+    <div class="bg-white rounded-2xl shadow-xl p-6 w-80">
+
+        <!-- Success Icon -->
+        <div id="loaderSuccess"
+             class="hidden flex justify-center mb-4">
+
+            <div class="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center scale-50 opacity-0 transition-all duration-300">
+
+                <svg class="w-9 h-9 text-white"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="3"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M5 13l4 4L19 7"/>
+                </svg>
+
+            </div>
+
+        </div>
+
+        <p id="loadingText"
+           class="text-center font-semibold text-lg mb-4">
+            Saving...
+        </p>
+
+        <div id="loaderProgress"
+             class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+
+            <div id="loadingBar"
+                 class="bg-black h-3 rounded-full transition-all duration-300"
+                 style="width:0%">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col pt-[72px] pb-[90px]">
+<!-- TopAppBar Component -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-margin-mobile py-4 bg-surface dark:bg-background docked full-width top-0 flat no shadows">
+<button aria-label="Menu" class="text-primary dark:text-on-primary-fixed hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-full p-2 transition-all duration-200 ease-in-out active:scale-95">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-on-primary-fixed">Orders</h1>
+<button aria-label="User Profile Avatar" class="hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-full transition-all duration-200 ease-in-out active:scale-95">
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="A close up, high key portrait of a professional corporate manager wearing a crisp white shirt against a stark minimalist white background. Soft, diffused lighting highlights sharp architectural features and a calm, authoritative expression. Black and white aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfw_Fx0WF64RGYm_FhDML305PNr_BYomHn4GR-LaPE8XtXTt49_AcsgiNRl5-XlfFj273Y8Zw8LM2FZ-iRv6eTj7ODb2bX9HTa3rK9hzHrVXibFn7Kij5FHEMuGDIhRho7XEHiLoDjogeh1qeaCbzsylRm7IEJx-VWtYDpda2VGZfUwECkihebMl4DTfQfHJTKN8M8PRagjWgfw8aqdLI2bJX17ajMYRzO2V4-QtZYINBwv8me7vI"/>
+</div>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow px-margin-mobile py-stack-md flex flex-col gap-stack-lg max-w-2xl mx-auto w-full" id="orders-container">
+    <div id="loader" class="flex justify-center items-center py-10 opacity-50">
+        <span class="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
+    </div>
+</main>
+<!-- BottomNavBar Component -->
+ <!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface dark:bg-surface-container-low border-t border-surface-container shadow-[0_-4px_20px_0_rgba(0,0,0,0.04)] z-50 md:hidden">
+
+    <!-- Attendance Button -->
+    <button
+        onclick="window.location.href='Home.html'"
+        class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-xl transition-all active:scale-90" href="#">
+
+        <span class="material-symbols-outlined mb-1" style="font-variation-settings:'FILL' 1;">fingerprint</span>
+        <span class="font-label-md text-label-md">Attendance</span>
+    </button>
+
+    <!-- Leave Button -->
+    <button
+        onclick="window.location.href='Leave.html'"
+        class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-secondary-fixed-variant px-6 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-all duration-200">
+
+        <span class="material-symbols-outlined mb-1" style="font-variation-settings:'FILL' 0;">event_busy</span>
+        <span class="font-label-md text-label-md">Leave</span>
+    </button>
+
+        <!-- FMS Button -->
+    <button
+        onclick="window.location.href='Leave.html'"
+ class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed text-on-primary-container dark:text-on-primary-fixed rounded-xl px-4 py-2 transition-all active:scale-90 shadow-sm" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+<span class="font-label-sm text-label-sm font-bold">FMS</span>
+
+    </button>
+
+</nav>
+
+<!-- Bottom Sheet Backdrop -->
+<div class="fixed inset-0 bg-black/40 z-[60] transition-opacity duration-300 opacity-0 pointer-events-none" id="bottom-sheet-backdrop" onclick="closeBottomSheet()"></div>
+<!-- Bottom Sheet -->
+<div class="fixed bottom-0 left-0 right-0 z-[70] bg-surface-container-lowest border-t border-outline-variant rounded-t-xl shadow-lg transform transition-transform duration-300 ease-in-out max-w-2xl mx-auto max-h-[90vh] overflow-y-auto translate-y-full" id="order-bottom-sheet">
+    <div class="flex justify-center py-3 sticky top-0 bg-surface-container-lowest z-10 border-b border-outline-variant/30">
+        <div class="w-12 h-1 bg-outline-variant rounded-full"></div>
+    </div>
+    <div class="px-margin-mobile py-4 flex flex-col gap-4">
+        
+        <div class="flex border-b border-outline-variant mb-4">
+            <button class="flex-grow py-3 text-center border-b-2 border-primary font-bold text-primary text-label-md uppercase tracking-wider" id="tab-btn-1">1. Goods Out</button>
+            <button class="flex-grow py-3 text-center border-b-2 border-transparent font-semibold text-secondary text-label-md uppercase tracking-wider hover:bg-surface-container-low transition-colors" id="tab-btn-2">2. Dispatch</button>
+        </div>
+
+        <div class="flex flex-col gap-stack-md step-transition" id="step-1-container">
+            <div class="flex flex-col gap-stack-sm border-outline-variant pb-8" id="camera-section-1">
+                <div class="aspect-video bg-black rounded-lg border border-outline-variant flex items-center justify-center overflow-hidden relative group">
+                    <video id="camera-feed-1" style="transform: scaleX(-1);" class="w-full h-full object-cover hidden" autoplay playsinline></video>
+                    <img id="camera-preview-1" class="w-full h-full object-cover hidden" />
+                    <canvas id="camera-canvas-1" class="hidden"></canvas>
+                    <div id="camera-overlay-1" class="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-white/40 text-5xl">photo_camera</span>
+                        <span class="text-white/60 font-label-md">Starting Camera...</span>
+                    </div>
+                </div>
+
+                <button id="btn-capture-1" class="w-full py-4 bg-primary text-on-primary rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 mt-2 group" onclick="capturePhoto(1)">
+                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">camera</span>
+                    <span class="font-label-md text-label-md uppercase tracking-wider flex items-center gap-2">Capture Photo</span>
+                </button>
+
+                <div id="action-buttons-post-capture-1" class="hidden gap-2 mt-2">
+                    <button class="w-1/3 py-4 bg-surface-container-high text-primary rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2" onclick="retakePhoto(1)">
+                        <span class="material-symbols-outlined">replay</span>
+                        <span class="font-label-md text-label-md uppercase tracking-wider">Retake</span>
+                    </button>
+                <button
+                    class="w-2/3 py-4 bg-primary text-on-primary rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 group"
+                    onclick="saveStepToSheet(1)">
+                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">
+                        save
+                    </span>
+                    <span class="font-label-md text-label-md uppercase tracking-wider">
+                        Save & Next
+                    </span>
+                </button>
+                    
+                </div>
+            </div>
+<div class="flex flex-col gap-3 p-4 border border-outline-variant rounded-lg bg-surface-container-low mb-4 hidden" id="step-1-success">
+    <div class="flex items-center gap-3">
+        <div class="w-16 h-16 bg-surface-container-high rounded border border-outline flex items-center justify-center overflow-hidden shrink-0">
+            <img id="step-1-summary-img" class="w-full h-full object-cover hidden" src="" alt="Goods Out" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');" />
+            <span id="step-1-summary-icon" class="material-symbols-outlined text-secondary">image</span>
+        </div>
+        <div class="flex-grow">
+            <p class="font-headline-sm text-headline-sm text-primary">Goods Out Completed</p>
+            <p class="font-label-sm text-label-sm text-secondary">Step 1 Summary</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mt-2 pt-3 border-t border-outline-variant/50">
+        <div>
+            <p class="font-label-sm text-label-sm text-secondary uppercase">Planned</p>
+            <p class="font-body-sm text-body-sm text-primary font-medium" id="step-1-planned-time">--:--</p>
+        </div>
+        <div>
+            <p class="font-label-sm text-label-sm text-secondary uppercase">Actual</p>
+            <p class="font-body-sm text-body-sm text-primary font-medium" id="step-1-actual-time">--:--</p>
+        </div>
+    </div>
+</div>
+        </div>
+
+<div class="flex-col gap-stack-md step-transition hidden" id="step-2-container">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+        
+        <div class="flex flex-col gap-stack-sm">
+            <label class="font-label-sm text-label-sm text-secondary uppercase">Dispatch Verification</label>
+            <div class="aspect-video bg-black rounded-lg border border-outline-variant flex items-center justify-center overflow-hidden relative group">
+                <video id="camera-feed-2" style="transform: scaleX(-1);" class="w-full h-full object-cover hidden" autoplay playsinline></video>
+                <img id="camera-preview-2" class="w-full h-full object-cover hidden" />
+                <canvas id="camera-canvas-2" class="hidden"></canvas>
+                <div id="camera-overlay-2" class="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-white/40 text-5xl">receipt_long</span>
+                    <span class="text-white/60 font-label-md">Starting Camera...</span>
+                </div>
+            </div>
+                    <div class="flex flex-col gap-stack-sm">
+            <select
+                id="delivery-type"
+                class="w-full p-3 border border-outline-variant rounded-lg bg-surface font-body-md">
+
+                <option value="">Select type...</option>
+                <option value="own">Own</option>
+                <option value="transport">Transport</option>
+                <option value="local">Local</option>
+            </select>
+             </div>
+            <button id="btn-capture-2" class="w-full py-4 bg-primary text-on-primary rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 group" onclick="capturePhoto(2)">
+                <span class="material-symbols-outlined">camera</span>
+                <span class="font-label-md uppercase">Capture</span>
+            </button>
+            <div id="action-buttons-post-capture-2" class="hidden gap-2">
+                  <button class="w-1/3 py-4 bg-surface-container-high text-primary rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2" onclick="retakePhoto(2)">
+                        <span class="material-symbols-outlined">replay</span>
+                        <span class="font-label-md text-label-md uppercase tracking-wider">Retake</span>
+                    </button>
+                    <button
+                    class="w-2/3 py-4 bg-primary text-on-primary rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 group"
+                    onclick="saveStepToSheet(2)">
+                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">
+                        save
+                    </span>
+                    <span class="font-label-md text-label-md uppercase tracking-wider">
+                        Save
+                    </span>
+                </button>
+                    
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+        <div class="flex flex-col gap-stack-md border-t border-outline-variant pt-stack-md mt-4">
+            <h4 class="font-headline-sm text-headline-sm text-primary">Order Summary</h4>
+            <div class="grid grid-cols-2 gap-y-4 bg-surface p-4 rounded-lg border border-outline-variant">
+                <div>
+                    <p class="font-label-sm text-label-sm text-secondary uppercase">Invoice</p>
+                    <p class="font-body-md text-body-md text-primary font-semibold" id="bs-invoice">--</p>
+                </div>
+                <div>
+                    <p class="font-label-sm text-label-sm text-secondary uppercase">Customer</p>
+                    <p class="font-body-md text-body-md text-primary truncate" id="bs-customer">--</p>
+                </div>
+                <div>
+                    <p class="font-label-sm text-label-sm text-secondary uppercase">Urgency</p>
+                    <p class="font-body-md text-body-md font-bold" id="bs-urgency">--</p>
+                </div>
+                <div>
+                    <p class="font-label-sm text-label-sm text-secondary uppercase">Time</p>
+                    <p class="font-body-md text-body-md font-bold" id="bs-time">--</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+   <script src="FMS.js"></script>
+</body></html>
