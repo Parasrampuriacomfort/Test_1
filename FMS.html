@@ -195,42 +195,18 @@
 <!-- BottomNavBar Component -->
  <!-- BottomNavBar -->
 <!-- Bottom Navigation -->
-<nav class="fixed bottom-0 left-0 right-0 z-50 bg-surface border-t border-surface-container">
-    <div class="flex justify-center items-center gap-40 py-3 pb-safe">
-
-        <!-- Attendance -->
-        <button
-            onclick="window.location.href='Home.html'"
-            class="flex flex-col items-center justify-center text-secondary hover:text-primary rounded-xl px-5 py-2 active:scale-95 transition-all duration-150">
-
-            <span class="material-symbols-outlined">fingerprint</span>
-
-            <span class="text-[11px] font-medium mt-1">Attendance</span>
+    <!-- BottomNavBar -->
+    <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface border-t border-surface-container z-50">
+        <button onclick="window.location.replace('Home.html')" class="interactive-btn flex flex-col items-center justify-center text-primary bg-surface-container-high rounded-full px-6 py-2">
+            <span class="material-symbols-outlined mb-1" style="font-variation-settings:'FILL' 1;">fingerprint</span>
+            <span class="font-label-md text-label-md">Attendance</span>
         </button>
-
-        <!-- Leave -->
-        <!-- <button
-            onclick="window.location.href='Leave.html'"
-            class="flex flex-col items-center justify-center text-secondary hover:text-primary rounded-xl px-5 py-2 active:scale-95 transition-all duration-150">
-
-            <span class="material-symbols-outlined">event_busy</span>
-
-            <span class="text-[11px] font-medium mt-1">Leave</span>
-        </button> -->
-
-        <!-- FMS (Active) -->
-        <button
-            onclick="window.location.href='FMS.html'"
-            class="flex flex-col items-center justify-center bg-primary text-on-primary rounded-xl px-5 py-2 active:scale-95 transition-all duration-150">
-
-            <span class="material-symbols-outlined"
+        <button onclick="window.location.replace('FMS.html')" class="interactive-btn flex flex-col items-center justify-center text-primary bg-surface-container-high rounded-full px-6 py-2">
+            <span class="material-symbols-outlined mb-1" 
                 style="font-variation-settings:'FILL' 1;">local_shipping</span>
-
-            <span class="text-[11px] font-medium mt-1">FMS</span>
+            <span class="font-label-md text-label-md">FMS</span>
         </button>
-
-    </div>
-</nav>
+    </nav>
 
 <!-- Bottom Sheet Backdrop -->
 <div class="fixed inset-0 bg-black/40 z-[60] transition-opacity duration-300 opacity-0 pointer-events-none" id="bottom-sheet-backdrop" onclick="closeBottomSheet()"></div>
