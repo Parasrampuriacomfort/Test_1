@@ -78,18 +78,40 @@ function parseTimeStr(timeStr) {
     return null;
 }
 
-// --- MODALS & LOADERS ---
-// --- MODALS & LOADERS ---
+// --- MODALS & SMART ERROR HANDLING ---
 function showLocationPopup(title, message) {
-    document.getElementById("locationPopupText").innerHTML = `<b>${title}</b><br><br>${message}`;
-    document.getElementById("locationPopup").classList.remove("hidden");
+    const popupText = document.getElementById("locationPopupText");
+    const popup = document.getElementById("locationPopup");
+    
+    if (popupText && popup) {
+        popupText.innerHTML = `<b>${title}</b><br><br>${message}`;
+        popup.classList.remove("hidden");
+    }
 }
 
 function closeLocationPopup() {
-    document.getElementById("locationPopup").classList.add("hidden");
+    const popup = document.getElementById("locationPopup");
+    if (popup) popup.classList.add("hidden");
     
     // Reset buttons to normal state if they were stuck loading
-    setButtonStates(true, true); // Or calculate exact state if needed
+    const cachedData = localStorage.getItem("attendanceCache");
+    const email = localStorage.getItem("email");
+    if (cachedData && email) {
+        processAttendanceData(JSON.parse(cachedData), email);
+    } else {
+        setButtonStates(true, true); 
+    }
+}
+
+async function enableLocation() {
+    closeLocationPopup();
+    
+    // Trigger action again to fire native browser prompt if available
+    if (attendanceAction === "checkin") {
+        await checkIn();
+    } else if (attendanceAction === "checkout") {
+        await checkOut();
+    }
 }
 
 // --- FAST LOCATION FETCHING ---
@@ -103,18 +125,20 @@ async function getLocation() {
         navigator.geolocation.getCurrentPosition(
             (position) => resolve({ latitude: position.coords.latitude, longitude: position.coords.longitude }),
             (error) => {
-                // Pinpoint exactly why it failed to help the user
+                // Smart Error Handling
                 if (error.code === error.PERMISSION_DENIED) {
                     showLocationPopup(
                         "Permission Denied", 
-                        "You blocked location access. Please tap the lock icon 🔒 in your browser's address bar, allow location, and refresh the page."
+                        "You blocked location access. Please tap the lock icon 🔒 in your browser's address bar, choose 'Allow', and try again."
                     );
-                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                } 
+                else if (error.code === error.POSITION_UNAVAILABLE) {
                     showLocationPopup(
                         "GPS is Off", 
-                        "Your phone's location/GPS is turned off. Please swipe down to turn on your GPS hardware and try again."
+                        "Your phone's hardware GPS is turned off. Please swipe down to turn on your Location/GPS and try again."
                     );
-                } else if (error.code === error.TIMEOUT) {
+                } 
+                else if (error.code === error.TIMEOUT) {
                     showLocationPopup(
                         "Timeout", 
                         "It took too long to find your location. Please ensure you have a clear view of the sky or good internet."
@@ -122,43 +146,7 @@ async function getLocation() {
                 }
                 reject(error);
             },
-            { enableHighAccuracy: true, timeout: 7000, maximumAge: 10000 } 
-        );
-    });
-}
-
-function closeLocationPopup() {
-    document.getElementById("locationPopup").classList.add("hidden");
-}
-
-async function enableLocation() {
-    closeLocationPopup();
-    navigator.geolocation.getCurrentPosition(
-        async function(position) {
-            // If they grant permission from the popup, immediately retry the action
-            if (attendanceAction === "checkin") await checkIn();
-            else if (attendanceAction === "checkout") await checkOut();
-        },
-        function() { alert("Please enable Location in your phone settings."); },
-        { enableHighAccuracy: true }
-    );
-}
-
-// --- FAST LOCATION FETCHING ---
-async function getLocation() {
-    return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) return reject("Geolocation is not supported.");
-        
-        navigator.geolocation.getCurrentPosition(
-            (position) => resolve({ latitude: position.coords.latitude, longitude: position.coords.longitude }),
-            (error) => {
-                if (error.code === error.PERMISSION_DENIED) showLocationPopup("Location permission is required to mark attendance.");
-                else if (error.code === error.POSITION_UNAVAILABLE) showLocationPopup("Location is turned OFF. Please enable GPS.");
-                else if (error.code === error.TIMEOUT) showLocationPopup("Unable to get your location.");
-                reject(error);
-            },
-            // maximumAge: 10000 allows the phone to use a location lock from the last 10 seconds to drastically speed up fetch time.
-            { enableHighAccuracy: true, timeout: 7000, maximumAge: 10000 } 
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
         );
     });
 }
@@ -189,7 +177,7 @@ async function checkIn() {
         const address = await getAddress(location.latitude, location.longitude);
         
         // 3. Location Confirmed! NOW apply Optimistic Update instantly
-        setButtonStates(false, true); // Instantly swap buttons
+        setButtonStates(false, true); 
         
         const employeeName = localStorage.getItem("name");
         const employeeEmail = localStorage.getItem("email");
