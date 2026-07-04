@@ -5,19 +5,19 @@ const checkinButton = document.getElementById("checkinButton");
 const checkoutButton = document.getElementById("checkoutButton");
 
 let attendanceAction = "";
-window.currentDbCheckInDate = null; // Store fetched check-in time safely
+window.currentDbCheckInDate = null; 
 
-// --- BUTTON EVENT LISTENERS (Instant Visual Feedback) ---
+// --- BUTTON EVENT LISTENERS ---
 if (checkinButton) {
     checkinButton.addEventListener("click", () => {
-        setButtonStates(false, true); // Instantly turn Check-In Gray, Check-Out Black
+        setButtonStates(false, true); 
         checkIn();
     });
 }
 
 if (checkoutButton) {
     checkoutButton.addEventListener("click", () => {
-        setButtonStates(false, false); // Instantly turn both Gray
+        setButtonStates(false, false); 
         checkOut();
     });
 }
@@ -86,14 +86,7 @@ function closeLocationPopup() {
     document.getElementById("locationPopup").classList.add("hidden");
 }
 
-function showLoading(title) {
-    document.getElementById("loadingTitle").innerText = title;
-    document.getElementById("loadingOverlay").classList.remove("hidden");
-}
-
-function hideLoading() {
-    document.getElementById("loadingOverlay").classList.add("hidden");
-}
+// (Loading overlay is removed from normal flow to make UI feel instant, only errors show alerts now)
 
 async function enableLocation() {
     closeLocationPopup();
@@ -120,7 +113,7 @@ async function getLocation() {
                 else if (error.code === error.TIMEOUT) showLocationPopup("Unable to get your location.");
                 reject(error);
             },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 } // Reduced timeout slightly
         );
     });
 }
@@ -139,103 +132,84 @@ async function getAddress(latitude, longitude) {
 // --- CHECK IN LOGIC ---
 async function checkIn() {
     attendanceAction = "checkin";
-    showLoading("Checking In...");
-    
+    const employeeName = localStorage.getItem("name");
+    const employeeEmail = localStorage.getItem("email");
+    const now = new Date();
+    const date = now.toISOString().split("T")[0];
+    const time = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+    const recordId = employeeEmail + "_" + date.replaceAll("-", "");
+
+    // 1. Optimistic Update (Instant Feedback)
+    let cached = JSON.parse(localStorage.getItem("attendanceCache") || "[]");
+    cached.push({ 
+        "Employee Email": employeeEmail, 
+        "Date": date, 
+        "Check In": time, 
+        "Check Out": "", 
+        "Total Working Hours": "" 
+    });
+    localStorage.setItem("attendanceCache", JSON.stringify(cached));
+    localStorage.setItem("localCheckInTime", Date.now().toString());
+    processAttendanceData(cached, employeeEmail);
+
     try {
+        // 2. Process Background GPS and Network Task
         const location = await getLocation();
         const address = await getAddress(location.latitude, location.longitude);
-        const now = new Date();
-        const employeeName = localStorage.getItem("name");
-        const employeeEmail = localStorage.getItem("email");
-        const date = now.toISOString().split("T")[0];
-        const time = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
-        
-        const recordId = employeeEmail + "_" + date.replaceAll("-", "");
         
         const data = {
-            action: "checkin",
-            recordId,
-            employeeName,
-            employeeEmail,
-            date,
-            checkIn: time,
-            checkInLocation: address
+            action: "checkin", recordId, employeeName, employeeEmail, date, checkIn: time, checkInLocation: address
         };
-
-        // Securely save Check-In millisecond to phone for math calculation
-        localStorage.setItem("localCheckInTime", Date.now().toString());
-
-        await fetch(API_URL, { method: "POST", body: JSON.stringify(data) });
-        
-        // Dynamically fetch and update UI without reloading the page
-        await loadAttendance();
-        
+        fetch(API_URL, { method: "POST", body: JSON.stringify(data) }); // Fire and forget
     } catch(error) {
         console.error(error);
-        alert("Unable to Check In");
-        setButtonStates(true, false); // Revert button state if failed
-    } finally {
-        hideLoading();
+        alert("Unable to acquire location for Check-In. Please ensure GPS is active.");
+        // We could revert the UI state here if strict validation is needed
     }
 }
 
-// --- CHECK OUT LOGIC (With exact hour calculation) ---
+// --- CHECK OUT LOGIC ---
 async function checkOut() {
     attendanceAction = "checkout";
-    showLoading("Checking Out...");
-    
+    const employeeEmail = localStorage.getItem("email");
+    const now = new Date();
+    const date = now.toISOString().split("T")[0];
+    const time = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+    const recordId = employeeEmail + "_" + date.replaceAll("-", "");
+
+    let checkInMs = localStorage.getItem("localCheckInTime") ? parseInt(localStorage.getItem("localCheckInTime")) : (window.currentDbCheckInDate ? window.currentDbCheckInDate.getTime() : null);
+    let cleanTimeStr = "--:--";
+
+    if (checkInMs) {
+        let diffMs = Math.max(0, Date.now() - checkInMs); 
+        let h = Math.floor(diffMs / 3600000);
+        let m = Math.floor((diffMs % 3600000) / 60000);
+        cleanTimeStr = `${h}h ${m}m`;
+    }
+
+    // 1. Optimistic Update
+    let cached = JSON.parse(localStorage.getItem("attendanceCache") || "[]");
+    let todayRecord = cached.reverse().find(r => r["Employee Email"] === employeeEmail && new Date(r.Date).toLocaleDateString("en-IN") === now.toLocaleDateString("en-IN"));
+    if (todayRecord) {
+        todayRecord["Check Out"] = time;
+        todayRecord["Total Working Hours"] = cleanTimeStr;
+    }
+    localStorage.setItem("attendanceCache", JSON.stringify(cached.reverse()));
+    localStorage.removeItem("localCheckInTime");
+    processAttendanceData(cached, employeeEmail);
+
     try {
+        // 2. Process Background Task
         const location = await getLocation();
         const address = await getAddress(location.latitude, location.longitude);
-        const now = new Date();
-        const employeeEmail = localStorage.getItem("email");
-        const date = now.toISOString().split("T")[0];
-        const time = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
-        
-        const recordId = employeeEmail + "_" + date.replaceAll("-", "");
         
         const data = {
-            action: "checkout",
-            recordId,
-            checkOut: time,
-            checkOutLocation: address
+            action: "checkout", recordId, checkOut: time, checkOutLocation: address, totalWorkingHours: cleanTimeStr, TotalWorkingHours: cleanTimeStr
         };
-
-        // --- TOTAL WORKING HOURS CALCULATION ---
-        let checkInMs = null;
-        if (localStorage.getItem("localCheckInTime")) {
-            checkInMs = parseInt(localStorage.getItem("localCheckInTime"));
-        } else if (window.currentDbCheckInDate) {
-            checkInMs = window.currentDbCheckInDate.getTime();
-        }
-
-        if (checkInMs) {
-            let diffMs = Date.now() - checkInMs;
-            if (diffMs < 0) diffMs = 0; 
-            
-            let h = Math.floor(diffMs / 3600000);
-            let m = Math.floor((diffMs % 3600000) / 60000);
-            
-            // Output pure hours and minutes only (e.g., 8h 30m)
-            const cleanTimeStr = `${h}h ${m}m`;
-            data.totalWorkingHours = cleanTimeStr;
-            data.TotalWorkingHours = cleanTimeStr; 
-        }
-        
-        // Clean up data for the next day
-        localStorage.removeItem("localCheckInTime");
-
-        await fetch(API_URL, { method: "POST", body: JSON.stringify(data) });
-        
-        // Dynamically fetch and update UI without reloading the page
-        await loadAttendance();
-        
+        fetch(API_URL, { method: "POST", body: JSON.stringify(data) }); // Fire and forget
     } catch(error) {
         console.error(error);
-        alert("Unable to Check Out");
-        setButtonStates(false, true); // Revert button state if failed
-    } finally {
-        hideLoading();
+        alert("Unable to acquire location for Check-Out.");
     }
 }
 
@@ -277,7 +251,36 @@ function renderList(records) {
     list.innerHTML = htmlString;
 }
 
-// --- INITIAL DATA FETCH ---
+// --- CORE PROCESSING LOGIC ---
+function processAttendanceData(data, email) {
+    const myAttendance = data.filter(r => r["Employee Email"] === email).reverse();
+    renderList(myAttendance);
+    
+    let canCheckIn = true;
+    let canCheckOut = false;
+
+    if (myAttendance.length > 0) {
+        const latestRecord = myAttendance[0];
+        const todayStr = new Date().toLocaleDateString("en-IN");
+        const recordDateStr = new Date(latestRecord.Date).toLocaleDateString("en-IN");
+
+        if (todayStr === recordDateStr) {
+            if (latestRecord["Check In"] && (!latestRecord["Check Out"] || latestRecord["Check Out"] === "--:--")) {
+                canCheckIn = false;
+                canCheckOut = true; 
+                const safeTimeStr = formatSafeTime(latestRecord["Check In"]);
+                window.currentDbCheckInDate = parseTimeStr(safeTimeStr);
+            } else if (latestRecord["Check In"] && latestRecord["Check Out"]) {
+                canCheckIn = false;
+                canCheckOut = false; 
+                localStorage.removeItem("localCheckInTime"); 
+            }
+        }
+    }
+    setButtonStates(canCheckIn, canCheckOut);
+}
+
+// --- INITIAL DATA FETCH (SWR Pattern) ---
 async function loadAttendance() {
     const email = localStorage.getItem("email");
     try {
@@ -285,44 +288,32 @@ async function loadAttendance() {
         if(profileImg) document.getElementById("profileImage").src = profileImg;
     } catch(e) {}
 
+    // 1. INSTANT LOAD: Check local cache first and render immediately
+    const cachedData = localStorage.getItem("attendanceCache");
+    if (cachedData) {
+        try {
+            processAttendanceData(JSON.parse(cachedData), email);
+        } catch (e) {
+            console.error("Cache parsing error", e);
+        }
+    }
+
+    // 2. BACKGROUND SYNC: Fetch fresh data from Google Apps Script
     try {
         const response = await fetch(API_URL_GET + "?email=" + encodeURIComponent(email));
         const data = await response.json();
         
-        const myAttendance = data.filter(r => r["Employee Email"] === email).reverse();
-        renderList(myAttendance);
+        // Update cache with fresh data
+        localStorage.setItem("attendanceCache", JSON.stringify(data));
         
-        // Day Reset Logic (Checks if today has records)
-        let canCheckIn = true;
-        let canCheckOut = false;
-
-        if (myAttendance.length > 0) {
-            const latestRecord = myAttendance[0];
-            const todayStr = new Date().toLocaleDateString("en-IN");
-            const recordDateStr = new Date(latestRecord.Date).toLocaleDateString("en-IN");
-
-            if (todayStr === recordDateStr) {
-                if (latestRecord["Check In"] && !latestRecord["Check Out"]) {
-                    canCheckIn = false;
-                    canCheckOut = true; // Waiting to check out
-                    
-                    // Capture Check-In time for math calculation in case user closed the app
-                    const safeTimeStr = formatSafeTime(latestRecord["Check In"]);
-                    window.currentDbCheckInDate = parseTimeStr(safeTimeStr);
-                    
-                } else if (latestRecord["Check In"] && latestRecord["Check Out"]) {
-                    canCheckIn = false;
-                    canCheckOut = false; // Finished day, disabled until tomorrow
-                    localStorage.removeItem("localCheckInTime"); 
-                }
-            }
-        }
-        setButtonStates(canCheckIn, canCheckOut);
-
+        // Re-render transparently to sync any background changes
+        processAttendanceData(data, email);
     } catch (err) {
-        console.error("Failed to load data", err);
-        const list = document.getElementById("attendanceList");
-        if(list) list.innerHTML = '<p class="p-4 text-center text-error">Failed to load data.</p>';
+        console.error("Failed to load live data, relying on cache.", err);
+        if (!cachedData) {
+            const list = document.getElementById("attendanceList");
+            if(list) list.innerHTML = '<p class="p-4 text-center text-error">Failed to load data.</p>';
+        }
     }
 }
 
