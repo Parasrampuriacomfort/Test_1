@@ -56,12 +56,11 @@
         </div>
     </div>
 
-    <div id="locationPopup" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-6 w-80 text-center">
-            <h2 class="text-xl font-bold mb-3">Enable Location</h2>
-            <p id="locationPopupText" class="text-gray-600 mb-5">Location is required.</p>
-            <button onclick="enableLocation()" class="w-full bg-black text-white py-3 rounded-lg interactive-btn">Enable Location</button>
-            <button onclick="closeLocationPopup()" class="mt-3 text-gray-500 interactive-btn">Cancel</button>
+<div id="locationPopup" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm transition-all">
+        <div class="bg-white rounded-xl p-6 w-80 text-center shadow-2xl">
+            <span class="material-symbols-outlined text-[48px] text-error mb-2" style="font-variation-settings: 'FILL' 1;">location_off</span>
+            <p id="locationPopupText" class="text-secondary text-sm mb-6 leading-relaxed"></p>
+            <button onclick="closeLocationPopup()" class="w-full bg-black text-white py-3 rounded-lg interactive-btn font-semibold">Okay, I'll fix it</button>
         </div>
     </div>
 
