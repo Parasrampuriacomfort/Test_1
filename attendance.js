@@ -5,19 +5,17 @@ const checkinButton = document.getElementById("checkinButton");
 const checkoutButton = document.getElementById("checkoutButton");
 
 let attendanceAction = "";
-window.currentDbCheckInDate = null; // Store fetched check-in time safely
+window.currentDbCheckInDate = null; 
 
-// --- BUTTON EVENT LISTENERS (Instant Visual Feedback) ---
+// --- BUTTON EVENT LISTENERS ---
 if (checkinButton) {
     checkinButton.addEventListener("click", () => {
-        setButtonStates(false, true); // Instantly turn Check-In Gray, Check-Out Black
         checkIn();
     });
 }
 
 if (checkoutButton) {
     checkoutButton.addEventListener("click", () => {
-        setButtonStates(false, false); // Instantly turn both Gray
         checkOut();
     });
 }
@@ -33,11 +31,15 @@ function setButtonStates(canCheckIn, canCheckOut) {
     if (cinBtn) {
         cinBtn.disabled = !canCheckIn;
         cinBtn.className = canCheckIn ? activeClass : disabledClass;
+        // Reset HTML in case it was stuck in locating state
+        cinBtn.innerHTML = `<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">login</span><span class="font-headline-sm text-headline-sm">Check In</span>`;
     }
     
     if (coutBtn) {
         coutBtn.disabled = !canCheckOut;
         coutBtn.className = canCheckOut ? activeClass : disabledClass;
+        // Reset HTML in case it was stuck in locating state
+        coutBtn.innerHTML = `<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 0;">logout</span><span class="font-headline-sm text-headline-sm">Check Out</span>`;
     }
 }
 
@@ -76,51 +78,75 @@ function parseTimeStr(timeStr) {
     return null;
 }
 
-// --- MODALS & LOADERS ---
-function showLocationPopup(message = "Location is required.") {
-    document.getElementById("locationPopupText").innerText = message;
-    document.getElementById("locationPopup").classList.remove("hidden");
+// --- MODALS & SMART ERROR HANDLING ---
+function showLocationPopup(title, message) {
+    const popupText = document.getElementById("locationPopupText");
+    const popup = document.getElementById("locationPopup");
+    
+    if (popupText && popup) {
+        popupText.innerHTML = `<b>${title}</b><br><br>${message}`;
+        popup.classList.remove("hidden");
+    }
 }
 
 function closeLocationPopup() {
-    document.getElementById("locationPopup").classList.add("hidden");
-}
-
-function showLoading(title) {
-    document.getElementById("loadingTitle").innerText = title;
-    document.getElementById("loadingOverlay").classList.remove("hidden");
-}
-
-function hideLoading() {
-    document.getElementById("loadingOverlay").classList.add("hidden");
+    const popup = document.getElementById("locationPopup");
+    if (popup) popup.classList.add("hidden");
+    
+    // Reset buttons to normal state if they were stuck loading
+    const cachedData = localStorage.getItem("attendanceCache");
+    const email = localStorage.getItem("email");
+    if (cachedData && email) {
+        processAttendanceData(JSON.parse(cachedData), email);
+    } else {
+        setButtonStates(true, true); 
+    }
 }
 
 async function enableLocation() {
     closeLocationPopup();
-    navigator.geolocation.getCurrentPosition(
-        async function(position) {
-            if (attendanceAction === "checkin") await checkIn();
-            else if (attendanceAction === "checkout") await checkOut();
-        },
-        function() { alert("Please enable Location in your phone settings."); },
-        { enableHighAccuracy: true }
-    );
+    
+    // Trigger action again to fire native browser prompt if available
+    if (attendanceAction === "checkin") {
+        await checkIn();
+    } else if (attendanceAction === "checkout") {
+        await checkOut();
+    }
 }
 
-// --- LOCATION FETCHING ---
+// --- FAST LOCATION FETCHING ---
 async function getLocation() {
     return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) return reject("Geolocation is not supported.");
+        if (!navigator.geolocation) {
+            showLocationPopup("Not Supported", "Your browser does not support location services.");
+            return reject("Geolocation is not supported.");
+        }
         
         navigator.geolocation.getCurrentPosition(
             (position) => resolve({ latitude: position.coords.latitude, longitude: position.coords.longitude }),
             (error) => {
-                if (error.code === error.PERMISSION_DENIED) showLocationPopup("Location permission is required to mark attendance.");
-                else if (error.code === error.POSITION_UNAVAILABLE) showLocationPopup("Location is turned OFF. Please enable GPS.");
-                else if (error.code === error.TIMEOUT) showLocationPopup("Unable to get your location.");
+                // Smart Error Handling
+                if (error.code === error.PERMISSION_DENIED) {
+                    showLocationPopup(
+                        "Permission Denied", 
+                        "You blocked location access. Please tap the lock icon 🔒 in your browser's address bar, choose 'Allow', and try again."
+                    );
+                } 
+                else if (error.code === error.POSITION_UNAVAILABLE) {
+                    showLocationPopup(
+                        "GPS is Off", 
+                        "Your phone's hardware GPS is turned off. Please swipe down to turn on your Location/GPS and try again."
+                    );
+                } 
+                else if (error.code === error.TIMEOUT) {
+                    showLocationPopup(
+                        "Timeout", 
+                        "It took too long to find your location. Please ensure you have a clear view of the sky or good internet."
+                    );
+                }
                 reject(error);
             },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
         );
     });
 }
@@ -139,103 +165,105 @@ async function getAddress(latitude, longitude) {
 // --- CHECK IN LOGIC ---
 async function checkIn() {
     attendanceAction = "checkin";
-    showLoading("Checking In...");
+    const cinBtn = document.getElementById("checkinButton");
+    
+    // 1. Enter Locating State (Visually indicate work is happening, but don't commit to cache yet)
+    const originalHtml = cinBtn.innerHTML;
+    cinBtn.innerHTML = `<span class="material-symbols-outlined text-[32px] animate-pulse" style="font-variation-settings: 'FILL' 1;">location_on</span><span class="font-headline-sm text-headline-sm">Locating...</span>`;
     
     try {
+        // 2. FETCH LOCATION FIRST (This will throw an error and stop if GPS is off)
         const location = await getLocation();
         const address = await getAddress(location.latitude, location.longitude);
-        const now = new Date();
+        
+        // 3. Location Confirmed! NOW apply Optimistic Update instantly
+        setButtonStates(false, true); 
+        
         const employeeName = localStorage.getItem("name");
         const employeeEmail = localStorage.getItem("email");
+        const now = new Date();
         const date = now.toISOString().split("T")[0];
         const time = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
-        
         const recordId = employeeEmail + "_" + date.replaceAll("-", "");
-        
-        const data = {
-            action: "checkin",
-            recordId,
-            employeeName,
-            employeeEmail,
-            date,
-            checkIn: time,
-            checkInLocation: address
-        };
 
-        // Securely save Check-In millisecond to phone for math calculation
+        let cached = JSON.parse(localStorage.getItem("attendanceCache") || "[]");
+        cached.push({ 
+            "Employee Email": employeeEmail, 
+            "Date": date, 
+            "Check In": time, 
+            "Check Out": "", 
+            "Total Working Hours": "" 
+        });
+        localStorage.setItem("attendanceCache", JSON.stringify(cached));
         localStorage.setItem("localCheckInTime", Date.now().toString());
+        processAttendanceData(cached, employeeEmail);
 
-        await fetch(API_URL, { method: "POST", body: JSON.stringify(data) });
-        
-        // Dynamically fetch and update UI without reloading the page
-        await loadAttendance();
-        
+        // 4. Send to Google Sheets in Background (Fire and forget)
+        const data = {
+            action: "checkin", recordId, employeeName, employeeEmail, date, checkIn: time, checkInLocation: address
+        };
+        fetch(API_URL, { method: "POST", body: JSON.stringify(data) }); 
+
     } catch(error) {
-        console.error(error);
-        alert("Unable to Check In");
-        setButtonStates(true, false); // Revert button state if failed
-    } finally {
-        hideLoading();
+        // LOCATION FAILED: Revert button visually so user can try again
+        cinBtn.innerHTML = originalHtml;
+        console.error("Check-in aborted due to location issue.");
     }
 }
 
-// --- CHECK OUT LOGIC (With exact hour calculation) ---
+// --- CHECK OUT LOGIC ---
 async function checkOut() {
     attendanceAction = "checkout";
-    showLoading("Checking Out...");
+    const coutBtn = document.getElementById("checkoutButton");
     
+    // 1. Enter Locating State
+    const originalHtml = coutBtn.innerHTML;
+    coutBtn.innerHTML = `<span class="material-symbols-outlined text-[32px] animate-pulse" style="font-variation-settings: 'FILL' 1;">location_on</span><span class="font-headline-sm text-headline-sm">Locating...</span>`;
+
     try {
+        // 2. FETCH LOCATION FIRST
         const location = await getLocation();
         const address = await getAddress(location.latitude, location.longitude);
-        const now = new Date();
+        
+        // 3. Location Confirmed! NOW apply Optimistic Update instantly
+        setButtonStates(false, false); 
+        
         const employeeEmail = localStorage.getItem("email");
+        const now = new Date();
         const date = now.toISOString().split("T")[0];
         const time = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
-        
         const recordId = employeeEmail + "_" + date.replaceAll("-", "");
-        
-        const data = {
-            action: "checkout",
-            recordId,
-            checkOut: time,
-            checkOutLocation: address
-        };
 
-        // --- TOTAL WORKING HOURS CALCULATION ---
-        let checkInMs = null;
-        if (localStorage.getItem("localCheckInTime")) {
-            checkInMs = parseInt(localStorage.getItem("localCheckInTime"));
-        } else if (window.currentDbCheckInDate) {
-            checkInMs = window.currentDbCheckInDate.getTime();
-        }
+        let checkInMs = localStorage.getItem("localCheckInTime") ? parseInt(localStorage.getItem("localCheckInTime")) : (window.currentDbCheckInDate ? window.currentDbCheckInDate.getTime() : null);
+        let cleanTimeStr = "--:--";
 
         if (checkInMs) {
-            let diffMs = Date.now() - checkInMs;
-            if (diffMs < 0) diffMs = 0; 
-            
+            let diffMs = Math.max(0, Date.now() - checkInMs); 
             let h = Math.floor(diffMs / 3600000);
             let m = Math.floor((diffMs % 3600000) / 60000);
-            
-            // Output pure hours and minutes only (e.g., 8h 30m)
-            const cleanTimeStr = `${h}h ${m}m`;
-            data.totalWorkingHours = cleanTimeStr;
-            data.TotalWorkingHours = cleanTimeStr; 
+            cleanTimeStr = `${h}h ${m}m`;
         }
-        
-        // Clean up data for the next day
-        localStorage.removeItem("localCheckInTime");
 
-        await fetch(API_URL, { method: "POST", body: JSON.stringify(data) });
-        
-        // Dynamically fetch and update UI without reloading the page
-        await loadAttendance();
-        
+        let cached = JSON.parse(localStorage.getItem("attendanceCache") || "[]");
+        let todayRecord = cached.reverse().find(r => r["Employee Email"] === employeeEmail && new Date(r.Date).toLocaleDateString("en-IN") === now.toLocaleDateString("en-IN"));
+        if (todayRecord) {
+            todayRecord["Check Out"] = time;
+            todayRecord["Total Working Hours"] = cleanTimeStr;
+        }
+        localStorage.setItem("attendanceCache", JSON.stringify(cached.reverse()));
+        localStorage.removeItem("localCheckInTime");
+        processAttendanceData(cached, employeeEmail);
+
+        // 4. Send to Google Sheets in Background
+        const data = {
+            action: "checkout", recordId, checkOut: time, checkOutLocation: address, totalWorkingHours: cleanTimeStr, TotalWorkingHours: cleanTimeStr
+        };
+        fetch(API_URL, { method: "POST", body: JSON.stringify(data) });
+
     } catch(error) {
-        console.error(error);
-        alert("Unable to Check Out");
-        setButtonStates(false, true); // Revert button state if failed
-    } finally {
-        hideLoading();
+        // LOCATION FAILED: Revert button visually
+        coutBtn.innerHTML = originalHtml;
+        console.error("Check-out aborted due to location issue.");
     }
 }
 
@@ -277,7 +305,36 @@ function renderList(records) {
     list.innerHTML = htmlString;
 }
 
-// --- INITIAL DATA FETCH ---
+// --- CORE PROCESSING LOGIC ---
+function processAttendanceData(data, email) {
+    const myAttendance = data.filter(r => r["Employee Email"] === email).reverse();
+    renderList(myAttendance);
+    
+    let canCheckIn = true;
+    let canCheckOut = false;
+
+    if (myAttendance.length > 0) {
+        const latestRecord = myAttendance[0];
+        const todayStr = new Date().toLocaleDateString("en-IN");
+        const recordDateStr = new Date(latestRecord.Date).toLocaleDateString("en-IN");
+
+        if (todayStr === recordDateStr) {
+            if (latestRecord["Check In"] && (!latestRecord["Check Out"] || latestRecord["Check Out"] === "--:--")) {
+                canCheckIn = false;
+                canCheckOut = true; 
+                const safeTimeStr = formatSafeTime(latestRecord["Check In"]);
+                window.currentDbCheckInDate = parseTimeStr(safeTimeStr);
+            } else if (latestRecord["Check In"] && latestRecord["Check Out"]) {
+                canCheckIn = false;
+                canCheckOut = false; 
+                localStorage.removeItem("localCheckInTime"); 
+            }
+        }
+    }
+    setButtonStates(canCheckIn, canCheckOut);
+}
+
+// --- INITIAL DATA FETCH (SWR Pattern) ---
 async function loadAttendance() {
     const email = localStorage.getItem("email");
     try {
@@ -285,44 +342,29 @@ async function loadAttendance() {
         if(profileImg) document.getElementById("profileImage").src = profileImg;
     } catch(e) {}
 
+    // 1. INSTANT LOAD: Check local cache first
+    const cachedData = localStorage.getItem("attendanceCache");
+    if (cachedData) {
+        try {
+            processAttendanceData(JSON.parse(cachedData), email);
+        } catch (e) {
+            console.error("Cache parsing error", e);
+        }
+    }
+
+    // 2. BACKGROUND SYNC: Fetch fresh data
     try {
         const response = await fetch(API_URL_GET + "?email=" + encodeURIComponent(email));
         const data = await response.json();
         
-        const myAttendance = data.filter(r => r["Employee Email"] === email).reverse();
-        renderList(myAttendance);
-        
-        // Day Reset Logic (Checks if today has records)
-        let canCheckIn = true;
-        let canCheckOut = false;
-
-        if (myAttendance.length > 0) {
-            const latestRecord = myAttendance[0];
-            const todayStr = new Date().toLocaleDateString("en-IN");
-            const recordDateStr = new Date(latestRecord.Date).toLocaleDateString("en-IN");
-
-            if (todayStr === recordDateStr) {
-                if (latestRecord["Check In"] && !latestRecord["Check Out"]) {
-                    canCheckIn = false;
-                    canCheckOut = true; // Waiting to check out
-                    
-                    // Capture Check-In time for math calculation in case user closed the app
-                    const safeTimeStr = formatSafeTime(latestRecord["Check In"]);
-                    window.currentDbCheckInDate = parseTimeStr(safeTimeStr);
-                    
-                } else if (latestRecord["Check In"] && latestRecord["Check Out"]) {
-                    canCheckIn = false;
-                    canCheckOut = false; // Finished day, disabled until tomorrow
-                    localStorage.removeItem("localCheckInTime"); 
-                }
-            }
-        }
-        setButtonStates(canCheckIn, canCheckOut);
-
+        localStorage.setItem("attendanceCache", JSON.stringify(data));
+        processAttendanceData(data, email);
     } catch (err) {
-        console.error("Failed to load data", err);
-        const list = document.getElementById("attendanceList");
-        if(list) list.innerHTML = '<p class="p-4 text-center text-error">Failed to load data.</p>';
+        console.error("Failed to load live data, relying on cache.", err);
+        if (!cachedData) {
+            const list = document.getElementById("attendanceList");
+            if(list) list.innerHTML = '<p class="p-4 text-center text-error">Failed to load data.</p>';
+        }
     }
 }
 
