@@ -79,9 +79,52 @@ function parseTimeStr(timeStr) {
 }
 
 // --- MODALS & LOADERS ---
-function showLocationPopup(message = "Location is required.") {
-    document.getElementById("locationPopupText").innerText = message;
+// --- MODALS & LOADERS ---
+function showLocationPopup(title, message) {
+    document.getElementById("locationPopupText").innerHTML = `<b>${title}</b><br><br>${message}`;
     document.getElementById("locationPopup").classList.remove("hidden");
+}
+
+function closeLocationPopup() {
+    document.getElementById("locationPopup").classList.add("hidden");
+    
+    // Reset buttons to normal state if they were stuck loading
+    setButtonStates(true, true); // Or calculate exact state if needed
+}
+
+// --- FAST LOCATION FETCHING ---
+async function getLocation() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            showLocationPopup("Not Supported", "Your browser does not support location services.");
+            return reject("Geolocation is not supported.");
+        }
+        
+        navigator.geolocation.getCurrentPosition(
+            (position) => resolve({ latitude: position.coords.latitude, longitude: position.coords.longitude }),
+            (error) => {
+                // Pinpoint exactly why it failed to help the user
+                if (error.code === error.PERMISSION_DENIED) {
+                    showLocationPopup(
+                        "Permission Denied", 
+                        "You blocked location access. Please tap the lock icon 🔒 in your browser's address bar, allow location, and refresh the page."
+                    );
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    showLocationPopup(
+                        "GPS is Off", 
+                        "Your phone's location/GPS is turned off. Please swipe down to turn on your GPS hardware and try again."
+                    );
+                } else if (error.code === error.TIMEOUT) {
+                    showLocationPopup(
+                        "Timeout", 
+                        "It took too long to find your location. Please ensure you have a clear view of the sky or good internet."
+                    );
+                }
+                reject(error);
+            },
+            { enableHighAccuracy: true, timeout: 7000, maximumAge: 10000 } 
+        );
+    });
 }
 
 function closeLocationPopup() {
