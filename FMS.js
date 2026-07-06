@@ -33,12 +33,12 @@ async function startCamera(step) {
     try {
         if(stream) stopCamera(); // kill any running camera before starting a new one
         stream = await navigator.mediaDevices.getUserMedia({ 
-         video: { 
+            video: { 
                 facingMode: 'environment',
-                width: { ideal: 1280 }, // 720p is standard and runs smooth
-                height: { ideal: 720 },
-                frameRate: { ideal: 30 } // Native fluid framerate
-            },
+                width: { ideal: 480, max: 640 },
+                height: { ideal: 360, max: 480 },
+                frameRate: { ideal: 15, max: 20 }
+            }, 
             audio: false 
         });
         
@@ -67,30 +67,6 @@ function stopCamera() {
         stream.getTracks().forEach(track => track.stop());
         stream = null;
     }
-}
-
-// Waits for the bottom sheet's slide-up transition to fully finish
-// before running `callback`. This avoids starting the camera WHILE
-// the sheet is still animating (transform transition + camera
-// negotiation competing at the same time was the main lag source).
-function afterSheetOpens(callback) {
-    const sheet = document.getElementById('order-bottom-sheet');
-    let done = false;
-    const finish = () => {
-        if (done) return;
-        done = true;
-        sheet.removeEventListener('transitionend', handler);
-        
-        // Defer the heavy camera boot until after the next browser paint
-        requestAnimationFrame(() => {
-            setTimeout(callback, 100); 
-        });
-    };
-    const handler = (e) => {
-        if (e.propertyName === 'transform') finish();
-    };
-    sheet.addEventListener('transitionend', handler);
-    setTimeout(finish, 400); // Safety fallback
 }
 
 function capturePhoto(step) {
@@ -132,26 +108,24 @@ function retakePhoto(step) {
 function completeStep1() {
     stopCamera(); // Make sure camera 1 is dead
     
+    // Hide Step 1 camera, show success block
     document.getElementById('camera-section-1').classList.add('hidden');
     document.getElementById('step-1-success').classList.remove('hidden');
     
+    // Transition to Step 2
     const step2 = document.getElementById('step-2-container');
     step2.classList.remove('hidden');
     step2.classList.add('flex');
     
+    // Update Tab Colors
     document.getElementById('tab-btn-1').classList.remove('border-primary', 'text-primary');
     document.getElementById('tab-btn-2').classList.add('border-primary', 'text-primary');
 
-    // Give DOM time to update classes
-    requestAnimationFrame(() => {
+    setTimeout(() => {
         step2.classList.remove('opacity-50', 'pointer-events-none');
         step2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        
-        // Wait 500ms for the smooth scroll to completely finish before freezing the thread with getUserMedia
-        setTimeout(() => {
-            startCamera(2); 
-        }, 500);
-    });
+        startCamera(2); // Boot Step 2 camera!
+    }, 300);
 }
 
 function completeDispatch() {
@@ -281,27 +255,18 @@ function openBottomSheet(invoiceNo) {
         tab1.classList.remove('border-primary', 'text-primary');
         tab2.classList.remove('border-primary', 'text-primary');
 
+        // Bulletproof check that ignores hidden spaces or capitalization in your Google Sheet
         const safeCheck = (val) => val && val.toString().trim().toLowerCase() === "done";
         
         const step1Done = safeCheck(order["Status of Goods Out"]);
         const step2Done = safeCheck(order["Status of Dispatch"]);
 
+        // Push a history entry so the phone's back button closes
+        // this sheet instead of closing/navigating away from the app.
         if (!sheetHistoryPushed) {
             history.pushState({ modal: 'orderSheet' }, '');
             sheetHistoryPushed = true;
         }
-
-        // --- HELPER TO PREVENT JANK ---
-        // This forces the phone to calculate the UI layout *before* animating
-        const animateSheetOpen = (stepCallback) => {
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    document.getElementById('bottom-sheet-backdrop').classList.remove('opacity-0', 'pointer-events-none');
-                    document.getElementById('order-bottom-sheet').classList.remove('translate-y-full');
-                    afterSheetOpens(stepCallback);
-                });
-            });
-        };
 
         if (step1Done && !step2Done) {
             // --- STEP 1 IS DONE: Show Summary Card & Open Step 2 ---
@@ -314,10 +279,14 @@ function openBottomSheet(invoiceNo) {
             const sheetImgUrl = order["Image Url of Step 1"];
 
             if (sheetImgUrl) {
+                // Properly extract the specific File ID
                 const idMatch = sheetImgUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || sheetImgUrl.match(/id=([a-zA-Z0-9_-]+)/);
                 
                 if (idMatch && idMatch[1]) {
                     const fileId = idMatch[1];
+                    // Don't auto-load the thumbnail — it was competing with
+                    // the camera for bandwidth/decode time right when Step 2
+                    // opens. Load it only if the user actually taps to view it.
                     step1ImgEl.classList.add('hidden');
                     step1IconEl.classList.remove('hidden');
                     step1IconEl.style.cursor = 'pointer';
@@ -337,7 +306,6 @@ function openBottomSheet(invoiceNo) {
                 step1IconEl.classList.remove('hidden');
             }
 
-            // DO ALL HEAVY DOM CHANGES HERE
             step1Container.classList.remove('hidden');
             document.getElementById('camera-section-1').classList.add('hidden');
             document.getElementById('step-1-success').classList.remove('hidden');
@@ -346,13 +314,15 @@ function openBottomSheet(invoiceNo) {
             step2Container.classList.add('flex');
             tab2.classList.add('border-primary', 'text-primary');
             
-            // Trigger animation cleanly
-            animateSheetOpen(() => startCamera(2));
+            document.getElementById('bottom-sheet-backdrop').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('order-bottom-sheet').classList.remove('translate-y-full');
+            
+            // Let the layout/paint settle before asking for the camera,
+            // instead of doing both at the exact same instant.
+            setTimeout(() => startCamera(2), 150);
 
         } else if (!step1Done) {
             // --- STEP 1 IS NOT DONE: Open Step 1 ---
-            
-            // DO ALL HEAVY DOM CHANGES HERE
             step1Container.classList.remove('hidden');
             document.getElementById('camera-section-1').classList.remove('hidden');
             document.getElementById('step-1-success').classList.add('hidden');
@@ -361,11 +331,14 @@ function openBottomSheet(invoiceNo) {
             step2Container.classList.remove('flex');
             tab1.classList.add('border-primary', 'text-primary');
             
-            // Trigger animation cleanly
-            animateSheetOpen(() => startCamera(1));
+            document.getElementById('bottom-sheet-backdrop').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('order-bottom-sheet').classList.remove('translate-y-full');
+            
+            startCamera(1);
             
         } else {
             alert("This order has been fully dispatched.");
+            // We already pushed a history entry above — undo it since we're not opening the sheet.
             if (sheetHistoryPushed) {
                 history.back();
             }
