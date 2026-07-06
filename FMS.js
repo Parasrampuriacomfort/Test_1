@@ -33,12 +33,12 @@ async function startCamera(step) {
     try {
         if(stream) stopCamera(); // kill any running camera before starting a new one
         stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { 
+         video: { 
                 facingMode: 'environment',
-                width: { ideal: 480, max: 640 },
-                height: { ideal: 360, max: 480 },
-                frameRate: { ideal: 15, max: 20 }
-            }, 
+                width: { ideal: 1280 }, // 720p is standard and runs smooth
+                height: { ideal: 720 },
+                frameRate: { ideal: 30 } // Native fluid framerate
+            },
             audio: false 
         });
         
@@ -80,15 +80,17 @@ function afterSheetOpens(callback) {
         if (done) return;
         done = true;
         sheet.removeEventListener('transitionend', handler);
-        callback();
+        
+        // Defer the heavy camera boot until after the next browser paint
+        requestAnimationFrame(() => {
+            setTimeout(callback, 100); 
+        });
     };
     const handler = (e) => {
         if (e.propertyName === 'transform') finish();
     };
     sheet.addEventListener('transitionend', handler);
-    // Safety fallback in case transitionend never fires
-    // (e.g. sheet was already open, or browser quirks).
-    setTimeout(finish, 400);
+    setTimeout(finish, 400); // Safety fallback
 }
 
 function capturePhoto(step) {
@@ -130,24 +132,26 @@ function retakePhoto(step) {
 function completeStep1() {
     stopCamera(); // Make sure camera 1 is dead
     
-    // Hide Step 1 camera, show success block
     document.getElementById('camera-section-1').classList.add('hidden');
     document.getElementById('step-1-success').classList.remove('hidden');
     
-    // Transition to Step 2
     const step2 = document.getElementById('step-2-container');
     step2.classList.remove('hidden');
     step2.classList.add('flex');
     
-    // Update Tab Colors
     document.getElementById('tab-btn-1').classList.remove('border-primary', 'text-primary');
     document.getElementById('tab-btn-2').classList.add('border-primary', 'text-primary');
 
-    setTimeout(() => {
+    // Give DOM time to update classes
+    requestAnimationFrame(() => {
         step2.classList.remove('opacity-50', 'pointer-events-none');
         step2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        startCamera(2); // Boot Step 2 camera!
-    }, 300);
+        
+        // Wait 500ms for the smooth scroll to completely finish before freezing the thread with getUserMedia
+        setTimeout(() => {
+            startCamera(2); 
+        }, 500);
+    });
 }
 
 function completeDispatch() {
