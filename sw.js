@@ -1,12 +1,12 @@
 const CACHE_NAME = 'presence-v1';
 const ASSETS = [
-  '/',
+  '/', // This caches the root
   '/index.html',
   '/Home.html',
   '/Leave.html',
   '/attendance.js',
   '/manifest.json',
-  // Note: Once you compile your Tailwind CSS, add '/style.css' here
+  '/style.css' // <-- Make sure to uncomment or add this if you are using it!
 ];
 
 // Install Service Worker and Cache Assets
