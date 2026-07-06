@@ -281,18 +281,27 @@ function openBottomSheet(invoiceNo) {
         tab1.classList.remove('border-primary', 'text-primary');
         tab2.classList.remove('border-primary', 'text-primary');
 
-        // Bulletproof check that ignores hidden spaces or capitalization in your Google Sheet
         const safeCheck = (val) => val && val.toString().trim().toLowerCase() === "done";
         
         const step1Done = safeCheck(order["Status of Goods Out"]);
         const step2Done = safeCheck(order["Status of Dispatch"]);
 
-        // Push a history entry so the phone's back button closes
-        // this sheet instead of closing/navigating away from the app.
         if (!sheetHistoryPushed) {
             history.pushState({ modal: 'orderSheet' }, '');
             sheetHistoryPushed = true;
         }
+
+        // --- HELPER TO PREVENT JANK ---
+        // This forces the phone to calculate the UI layout *before* animating
+        const animateSheetOpen = (stepCallback) => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    document.getElementById('bottom-sheet-backdrop').classList.remove('opacity-0', 'pointer-events-none');
+                    document.getElementById('order-bottom-sheet').classList.remove('translate-y-full');
+                    afterSheetOpens(stepCallback);
+                });
+            });
+        };
 
         if (step1Done && !step2Done) {
             // --- STEP 1 IS DONE: Show Summary Card & Open Step 2 ---
@@ -305,14 +314,10 @@ function openBottomSheet(invoiceNo) {
             const sheetImgUrl = order["Image Url of Step 1"];
 
             if (sheetImgUrl) {
-                // Properly extract the specific File ID
                 const idMatch = sheetImgUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || sheetImgUrl.match(/id=([a-zA-Z0-9_-]+)/);
                 
                 if (idMatch && idMatch[1]) {
                     const fileId = idMatch[1];
-                    // Don't auto-load the thumbnail — it was competing with
-                    // the camera for bandwidth/decode time right when Step 2
-                    // opens. Load it only if the user actually taps to view it.
                     step1ImgEl.classList.add('hidden');
                     step1IconEl.classList.remove('hidden');
                     step1IconEl.style.cursor = 'pointer';
@@ -332,6 +337,7 @@ function openBottomSheet(invoiceNo) {
                 step1IconEl.classList.remove('hidden');
             }
 
+            // DO ALL HEAVY DOM CHANGES HERE
             step1Container.classList.remove('hidden');
             document.getElementById('camera-section-1').classList.add('hidden');
             document.getElementById('step-1-success').classList.remove('hidden');
@@ -340,15 +346,13 @@ function openBottomSheet(invoiceNo) {
             step2Container.classList.add('flex');
             tab2.classList.add('border-primary', 'text-primary');
             
-            document.getElementById('bottom-sheet-backdrop').classList.remove('opacity-0', 'pointer-events-none');
-            document.getElementById('order-bottom-sheet').classList.remove('translate-y-full');
-            
-            // Wait for the sheet's slide-up animation to actually finish,
-            // THEN start the camera — no more overlap/guessing.
-            afterSheetOpens(() => startCamera(2));
+            // Trigger animation cleanly
+            animateSheetOpen(() => startCamera(2));
 
         } else if (!step1Done) {
             // --- STEP 1 IS NOT DONE: Open Step 1 ---
+            
+            // DO ALL HEAVY DOM CHANGES HERE
             step1Container.classList.remove('hidden');
             document.getElementById('camera-section-1').classList.remove('hidden');
             document.getElementById('step-1-success').classList.add('hidden');
@@ -357,14 +361,11 @@ function openBottomSheet(invoiceNo) {
             step2Container.classList.remove('flex');
             tab1.classList.add('border-primary', 'text-primary');
             
-            document.getElementById('bottom-sheet-backdrop').classList.remove('opacity-0', 'pointer-events-none');
-            document.getElementById('order-bottom-sheet').classList.remove('translate-y-full');
-            
-            afterSheetOpens(() => startCamera(1));
+            // Trigger animation cleanly
+            animateSheetOpen(() => startCamera(1));
             
         } else {
             alert("This order has been fully dispatched.");
-            // We already pushed a history entry above — undo it since we're not opening the sheet.
             if (sheetHistoryPushed) {
                 history.back();
             }
