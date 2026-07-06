@@ -79,14 +79,54 @@ function parseTimeStr(timeStr) {
 }
 
 // --- MODALS & SMART ERROR HANDLING ---
-function showLocationPopup(title, message) {
-    const popupText = document.getElementById("locationPopupText");
-    const popup = document.getElementById("locationPopup");
-    
-    if (popupText && popup) {
-        popupText.innerHTML = `<b>${title}</b><br><br>${message}`;
-        popup.classList.remove("hidden");
+
+// Icon + label rows shown inside the popup, built dynamically per situation
+function buildLocationSteps(kind) {
+    // kind: "permission" | "gps" | "unsupported"
+    const rows = [];
+
+    if (kind === "permission" || kind === "gps") {
+        rows.push(`
+            <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-indigo-300" style="font-variation-settings:'FILL' 1;">location_on</span>
+                <span class="text-gray-200 text-sm pt-0.5">Device location</span>
+            </div>`);
     }
+    if (kind === "permission") {
+        rows.push(`
+            <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-indigo-300" style="font-variation-settings:'FILL' 1;">my_location</span>
+                <span class="text-gray-200 text-sm pt-0.5">Site permission to access your location (currently blocked)</span>
+            </div>`);
+    }
+    if (kind === "gps") {
+        rows.push(`
+            <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-indigo-300" style="font-variation-settings:'FILL' 1;">gps_off</span>
+                <span class="text-gray-200 text-sm pt-0.5">GPS / Location Accuracy is turned off in your phone's quick settings</span>
+            </div>`);
+    }
+    return rows.join("");
+}
+
+function showLocationPopup(title, message, kind = "gps") {
+    const popup = document.getElementById("locationPopup");
+    const popupTitle = document.getElementById("locationPopupTitle");
+    const popupText = document.getElementById("locationPopupText");
+    const stepsBox = document.getElementById("locationPopupSteps");
+    const turnOnBtn = document.getElementById("locationPopupTurnOnBtn");
+
+    if (popupTitle) popupTitle.textContent = title;
+    if (popupText) popupText.textContent = message;
+    if (stepsBox) stepsBox.innerHTML = buildLocationSteps(kind);
+
+    // If permission is hard-blocked, the browser can't re-prompt itself —
+    // "Turn on" can't do anything until the user flips it in browser settings.
+    if (turnOnBtn) {
+        turnOnBtn.style.display = kind === "permission" ? "none" : "inline-block";
+    }
+
+    if (popup) popup.classList.remove("hidden");
 }
 
 function closeLocationPopup() {
@@ -103,6 +143,109 @@ function closeLocationPopup() {
     }
 }
 
+// --- LIVE LOCATION STATUS BADGE ---
+function setLocationBadge(state) {
+    // state: "on" | "off" | "checking" | "blocked"
+    const dot = document.getElementById("locationStatusDot");
+    const text = document.getElementById("locationStatusText");
+    if (!dot || !text) return;
+
+    const styles = {
+        checking: { dot: "bg-gray-400", label: "Checking location…" },
+        on:       { dot: "bg-green-500", label: "Location enabled ✓" },
+        off:      { dot: "bg-error animate-pulse", label: "Location is off — tap to enable" },
+        blocked:  { dot: "bg-error animate-pulse", label: "Location permission blocked — tap to fix" },
+    };
+    const s = styles[state] || styles.checking;
+    dot.className = `w-2 h-2 rounded-full ${s.dot}`;
+    text.textContent = s.label;
+}
+
+// Runs proactively (on load + whenever the tab becomes visible again)
+// so the user knows the location status BEFORE tapping Check In/Out.
+async function checkLocationStatus(showPopupIfOff = false) {
+    if (!navigator.geolocation) {
+        setLocationBadge("off");
+        if (showPopupIfOff) {
+            showLocationPopup("Location Not Supported", "Your browser does not support location services.", "unsupported");
+        }
+        return false;
+    }
+
+    setLocationBadge("checking");
+
+    // 1. Check permission state if the browser supports it
+    if (navigator.permissions && navigator.permissions.query) {
+        try {
+            const status = await navigator.permissions.query({ name: "geolocation" });
+
+            // Keep the badge live if the user changes permission mid-session
+            status.onchange = () => checkLocationStatus(false);
+
+            if (status.state === "denied") {
+                setLocationBadge("blocked");
+                if (showPopupIfOff) {
+                    showLocationPopup(
+                        "Location Permission Blocked",
+                        "Tap the lock icon 🔒 in your browser's address bar → Permissions → Location → Allow, then reload the page.",
+                        "permission"
+                    );
+                }
+                return false;
+            }
+        } catch (e) {
+            // Permissions API not fully supported (e.g. older iOS Safari) — fall through to direct check
+        }
+    }
+
+    // 2. Actually attempt a (low accuracy, cheap) location read.
+    // This is what catches "permission granted but device GPS/location toggle is off".
+    return new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+            () => {
+                setLocationBadge("on");
+                resolve(true);
+            },
+            (error) => {
+                if (error.code === error.PERMISSION_DENIED) {
+                    setLocationBadge("blocked");
+                    if (showPopupIfOff) {
+                        showLocationPopup(
+                            "Location Permission Blocked",
+                            "Tap the lock icon 🔒 in your browser's address bar → Permissions → Location → Allow, then reload the page.",
+                            "permission"
+                        );
+                    }
+                } else {
+                    // POSITION_UNAVAILABLE or TIMEOUT ~= device location/GPS is off
+                    setLocationBadge("off");
+                    if (showPopupIfOff) {
+                        showLocationPopup(
+                            "Turn On Device Location",
+                            "Swipe down and enable Location/GPS on your phone, then try again.",
+                            "gps"
+                        );
+                    }
+                }
+                resolve(false);
+            },
+            { enableHighAccuracy: false, timeout: 6000, maximumAge: 30000 }
+        );
+    });
+}
+
+// Tapping the badge itself re-checks and shows the popup immediately if off
+document.addEventListener("DOMContentLoaded", () => {
+    const badge = document.getElementById("locationStatusBadge");
+    if (badge) badge.addEventListener("click", () => checkLocationStatus(true));
+});
+
+// Re-check whenever the user comes back to the tab/app (they may have just
+// flipped the GPS toggle in quick settings and returned)
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") checkLocationStatus(false);
+});
+
 async function enableLocation() {
     closeLocationPopup();
     
@@ -118,7 +261,7 @@ async function enableLocation() {
 async function getLocation() {
     return new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
-            showLocationPopup("Not Supported", "Your browser does not support location services.");
+            showLocationPopup("Not Supported", "Your browser does not support location services.", "unsupported");
             return reject("Geolocation is not supported.");
         }
         
@@ -129,19 +272,22 @@ async function getLocation() {
                 if (error.code === error.PERMISSION_DENIED) {
                     showLocationPopup(
                         "Permission Denied", 
-                        "You blocked location access. Please tap the lock icon 🔒 in your browser's address bar, choose 'Allow', and try again."
+                        "You blocked location access. Please tap the lock icon 🔒 in your browser's address bar, choose 'Allow', and try again.",
+                        "permission"
                     );
                 } 
                 else if (error.code === error.POSITION_UNAVAILABLE) {
                     showLocationPopup(
                         "GPS is Off", 
-                        "Your phone's hardware GPS is turned off. Please swipe down to turn on your Location/GPS and try again."
+                        "Your phone's hardware GPS is turned off. Please swipe down to turn on your Location/GPS and try again.",
+                        "gps"
                     );
                 } 
                 else if (error.code === error.TIMEOUT) {
                     showLocationPopup(
                         "Timeout", 
-                        "It took too long to find your location. Please ensure you have a clear view of the sky or good internet."
+                        "It took too long to find your location. Please ensure you have a clear view of the sky or good internet.",
+                        "gps"
                     );
                 }
                 reject(error);
@@ -370,3 +516,4 @@ async function loadAttendance() {
 
 // Start sequence
 loadAttendance();
+checkLocationStatus(true); // proactively tell the user location status on load
