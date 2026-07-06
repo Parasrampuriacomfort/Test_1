@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en" style="">
-<head>
+<html class="light" lang="en" style=""><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Presence FMS - Orders</title>
@@ -125,19 +124,6 @@
         }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         .step-transition { transition: all 0.3s ease-in-out; }
-        /* Perf: hint the browser to prepare a GPU layer for these
-           BEFORE they animate, instead of promoting them mid-animation.
-           This is what was causing jank when the camera started at
-           almost the same instant as the sheet's slide-up transition. */
-        #order-bottom-sheet, #bottom-sheet-backdrop {
-            will-change: transform, opacity;
-        }
-        /* Isolate the camera's own layer so decoding the video feed
-           doesn't force a repaint of the whole sheet around it. */
-        #camera-feed-1, #camera-feed-2 {
-            will-change: transform;
-            contain: layout paint;
-        }
     </style>
 </head>
 
@@ -239,7 +225,7 @@
         <div class="flex flex-col gap-stack-md step-transition" id="step-1-container">
             <div class="flex flex-col gap-stack-sm border-outline-variant pb-8" id="camera-section-1">
                 <div class="aspect-video bg-black rounded-lg border border-outline-variant flex items-center justify-center overflow-hidden relative group">
-                    <video id="camera-feed-1" style="transform: scaleX(1);" class="w-full h-full object-cover hidden" autoplay playsinline muted></video>
+                    <video id="camera-feed-1" style="transform: scaleX(1);" class="w-full h-full object-cover hidden" autoplay playsinline></video>
                     <img id="camera-preview-1" class="w-full h-full object-cover hidden" />
                     <canvas id="camera-canvas-1" class="hidden"></canvas>
                     <div id="camera-overlay-1" class="absolute inset-0 flex flex-col items-center justify-center gap-2">
@@ -301,7 +287,7 @@
         <div class="flex flex-col gap-stack-sm">
             <label class="font-label-sm text-label-sm text-secondary uppercase">Dispatch Verification</label>
             <div class="aspect-video bg-black rounded-lg border border-outline-variant flex items-center justify-center overflow-hidden relative group">
-                <video id="camera-feed-2" style="transform: scaleX(1);" class="w-full h-full object-cover hidden" autoplay playsinline muted></video>
+                <video id="camera-feed-2" style="transform: scaleX(-1);" class="w-full h-full object-cover hidden" autoplay playsinline></video>
                 <img id="camera-preview-2" class="w-full h-full object-cover hidden" />
                 <canvas id="camera-canvas-2" class="hidden"></canvas>
                 <div id="camera-overlay-2" class="absolute inset-0 flex flex-col items-center justify-center gap-2">
