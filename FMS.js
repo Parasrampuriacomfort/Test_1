@@ -138,7 +138,13 @@ function completeStep1() {
 function completeDispatch() {
     closeBottomSheet();
 }
-
+function actuallyCloseBottomSheet() {
+    // Instantly hide the UI
+    document.getElementById('bottom-sheet-backdrop').classList.add('hidden');
+    document.getElementById('order-bottom-sheet').classList.add('hidden');
+    stopCamera();
+    sheetHistoryPushed = false;
+}
 // ============================================================
 // FIX #2: BACK BUTTON — close the sheet instead of the whole app
 //
@@ -224,8 +230,7 @@ async function loadOrders() {
         document.getElementById('loader').classList.add('hidden');
     }
 }
-
-function openBottomSheet(invoiceNo) {
+ function openBottomSheet(invoiceNo) {
     const order = globalOrders.find(o => o["Invoice No"] == invoiceNo);
     
     if (order) {
@@ -272,21 +277,8 @@ function openBottomSheet(invoiceNo) {
             sheetHistoryPushed = true;
         }
 
-        // --- HELPER TO PREVENT JANK ---
-        // This forces the phone to calculate the UI layout *before* animating
-        const animateSheetOpen = (stepCallback) => {
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    document.getElementById('bottom-sheet-backdrop').classList.remove('opacity-0', 'pointer-events-none');
-                    document.getElementById('order-bottom-sheet').classList.remove('translate-y-full');
-                    afterSheetOpens(stepCallback);
-                });
-            });
-        };
-
         if (step1Done && !step2Done) {
             // --- STEP 1 IS DONE: Show Summary Card & Open Step 2 ---
-            
             document.getElementById('step-1-planned-time').textContent = formatTimeStr(order["Planned Time for Goods Out"]);
             document.getElementById('step-1-actual-time').textContent = formatTimeStr(order["Actual Time for Goods Out"]);
             
@@ -296,7 +288,6 @@ function openBottomSheet(invoiceNo) {
 
             if (sheetImgUrl) {
                 const idMatch = sheetImgUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || sheetImgUrl.match(/id=([a-zA-Z0-9_-]+)/);
-                
                 if (idMatch && idMatch[1]) {
                     const fileId = idMatch[1];
                     step1ImgEl.classList.add('hidden');
@@ -318,7 +309,6 @@ function openBottomSheet(invoiceNo) {
                 step1IconEl.classList.remove('hidden');
             }
 
-            // DO ALL HEAVY DOM CHANGES HERE
             step1Container.classList.remove('hidden');
             document.getElementById('camera-section-1').classList.add('hidden');
             document.getElementById('step-1-success').classList.remove('hidden');
@@ -327,13 +317,13 @@ function openBottomSheet(invoiceNo) {
             step2Container.classList.add('flex');
             tab2.classList.add('border-primary', 'text-primary');
             
-            // Trigger animation cleanly
-            animateSheetOpen(() => startCamera(2));
+            // INSTANTLY show the sheet and start the camera
+            document.getElementById('bottom-sheet-backdrop').classList.remove('hidden');
+            document.getElementById('order-bottom-sheet').classList.remove('hidden');
+            startCamera(2);
 
         } else if (!step1Done) {
             // --- STEP 1 IS NOT DONE: Open Step 1 ---
-            
-            // DO ALL HEAVY DOM CHANGES HERE
             step1Container.classList.remove('hidden');
             document.getElementById('camera-section-1').classList.remove('hidden');
             document.getElementById('step-1-success').classList.add('hidden');
@@ -342,15 +332,14 @@ function openBottomSheet(invoiceNo) {
             step2Container.classList.remove('flex');
             tab1.classList.add('border-primary', 'text-primary');
             
-            // Trigger animation cleanly
-            animateSheetOpen(() => startCamera(1));
+            // INSTANTLY show the sheet and start the camera
+            document.getElementById('bottom-sheet-backdrop').classList.remove('hidden');
+            document.getElementById('order-bottom-sheet').classList.remove('hidden');
+            startCamera(1);
             
         } else {
             alert("This order has been fully dispatched.");
-            if (sheetHistoryPushed) {
-                history.back();
-            }
-            return;
+            if (sheetHistoryPushed) history.back();
         }
     }
 }
