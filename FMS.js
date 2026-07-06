@@ -35,12 +35,20 @@ async function startCamera(step) {
         stream = await navigator.mediaDevices.getUserMedia({ 
             video: { 
                 facingMode: 'environment',
-                width: { ideal: 960 },
-                height: { ideal: 720 },
-                frameRate: { ideal: 24, max: 30 }
+                width: { ideal: 480, max: 640 },
+                height: { ideal: 360, max: 480 },
+                frameRate: { ideal: 15, max: 20 }
             }, 
             audio: false 
         });
+        
+        // Force lightweight playback attributes via JS (in case they're
+        // missing in the HTML) — these matter a lot for smooth <video>
+        // rendering inside WebViews/PWAs.
+        feed.setAttribute('playsinline', '');
+        feed.setAttribute('muted', '');
+        feed.muted = true;
+        feed.disablePictureInPicture = true;
         
         feed.srcObject = stream;
         
@@ -276,15 +284,18 @@ function openBottomSheet(invoiceNo) {
                 
                 if (idMatch && idMatch[1]) {
                     const fileId = idMatch[1];
-                    // Delay the thumbnail fetch slightly so it doesn't compete
-                    // with the camera starting up at the exact same instant.
-                    setTimeout(() => {
+                    // Don't auto-load the thumbnail — it was competing with
+                    // the camera for bandwidth/decode time right when Step 2
+                    // opens. Load it only if the user actually taps to view it.
+                    step1ImgEl.classList.add('hidden');
+                    step1IconEl.classList.remove('hidden');
+                    step1IconEl.style.cursor = 'pointer';
+                    step1IconEl.onclick = () => {
                         step1ImgEl.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
-                    }, 400);
-                    
-                    step1ImgEl.onload = () => {
-                        step1ImgEl.classList.remove('hidden');
-                        step1IconEl.classList.add('hidden');
+                        step1ImgEl.onload = () => {
+                            step1ImgEl.classList.remove('hidden');
+                            step1IconEl.classList.add('hidden');
+                        };
                     };
                 } else {
                     step1ImgEl.classList.add('hidden');
@@ -306,7 +317,9 @@ function openBottomSheet(invoiceNo) {
             document.getElementById('bottom-sheet-backdrop').classList.remove('opacity-0', 'pointer-events-none');
             document.getElementById('order-bottom-sheet').classList.remove('translate-y-full');
             
-            startCamera(2);
+            // Let the layout/paint settle before asking for the camera,
+            // instead of doing both at the exact same instant.
+            setTimeout(() => startCamera(2), 150);
 
         } else if (!step1Done) {
             // --- STEP 1 IS NOT DONE: Open Step 1 ---
