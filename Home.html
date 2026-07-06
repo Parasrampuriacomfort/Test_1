@@ -56,11 +56,21 @@
         </div>
     </div>
 
-<div id="locationPopup" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm transition-all">
-        <div class="bg-white rounded-xl p-6 w-80 text-center shadow-2xl">
-            <span class="material-symbols-outlined text-[48px] text-error mb-2" style="font-variation-settings: 'FILL' 1;">location_off</span>
-            <p id="locationPopupText" class="text-secondary text-sm mb-6 leading-relaxed"></p>
-            <button onclick="closeLocationPopup()" class="w-full bg-black text-white py-3 rounded-lg interactive-btn font-semibold">Okay, I'll fix it</button>
+<div id="locationPopup" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm transition-all px-6">
+        <div class="bg-[#131314] rounded-2xl p-6 w-full max-w-sm shadow-2xl text-left">
+            <h2 id="locationPopupTitle" class="text-white text-xl font-semibold mb-4 leading-snug">To continue, your device will need to use Location</h2>
+            <p class="text-gray-400 text-sm mb-3">The following settings should be on:</p>
+
+            <div id="locationPopupSteps" class="flex flex-col gap-4 mb-2">
+                <!-- Step rows injected by JS -->
+            </div>
+
+            <p id="locationPopupText" class="text-gray-400 text-sm mt-4 mb-6 leading-relaxed"></p>
+
+            <div class="flex items-center justify-end gap-3">
+                <button onclick="closeLocationPopup()" class="interactive-btn text-gray-300 border border-gray-600 rounded-full px-5 py-2.5 font-medium text-sm">No thanks</button>
+                <button id="locationPopupTurnOnBtn" onclick="enableLocation()" class="interactive-btn bg-indigo-200 text-indigo-950 rounded-full px-5 py-2.5 font-semibold text-sm">Turn on</button>
+            </div>
         </div>
     </div>
 
@@ -90,7 +100,10 @@
                 </button>
             </div>
             <div class="text-center">
-                <span class="font-body-sm text-body-sm text-secondary">Location Must Be Enable 📍</span>
+                <span id="locationStatusBadge" class="inline-flex items-center gap-1.5 font-body-sm text-body-sm text-secondary transition-colors">
+                    <span id="locationStatusDot" class="w-2 h-2 rounded-full bg-gray-400"></span>
+                    <span id="locationStatusText">Checking location…</span>
+                </span>
             </div>
         </section>
 
