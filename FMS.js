@@ -69,6 +69,28 @@ function stopCamera() {
     }
 }
 
+// Waits for the bottom sheet's slide-up transition to fully finish
+// before running `callback`. This avoids starting the camera WHILE
+// the sheet is still animating (transform transition + camera
+// negotiation competing at the same time was the main lag source).
+function afterSheetOpens(callback) {
+    const sheet = document.getElementById('order-bottom-sheet');
+    let done = false;
+    const finish = () => {
+        if (done) return;
+        done = true;
+        sheet.removeEventListener('transitionend', handler);
+        callback();
+    };
+    const handler = (e) => {
+        if (e.propertyName === 'transform') finish();
+    };
+    sheet.addEventListener('transitionend', handler);
+    // Safety fallback in case transitionend never fires
+    // (e.g. sheet was already open, or browser quirks).
+    setTimeout(finish, 400);
+}
+
 function capturePhoto(step) {
     if (!stream) return;
 
@@ -317,9 +339,9 @@ function openBottomSheet(invoiceNo) {
             document.getElementById('bottom-sheet-backdrop').classList.remove('opacity-0', 'pointer-events-none');
             document.getElementById('order-bottom-sheet').classList.remove('translate-y-full');
             
-            // Let the layout/paint settle before asking for the camera,
-            // instead of doing both at the exact same instant.
-            setTimeout(() => startCamera(2), 150);
+            // Wait for the sheet's slide-up animation to actually finish,
+            // THEN start the camera — no more overlap/guessing.
+            afterSheetOpens(() => startCamera(2));
 
         } else if (!step1Done) {
             // --- STEP 1 IS NOT DONE: Open Step 1 ---
@@ -334,7 +356,7 @@ function openBottomSheet(invoiceNo) {
             document.getElementById('bottom-sheet-backdrop').classList.remove('opacity-0', 'pointer-events-none');
             document.getElementById('order-bottom-sheet').classList.remove('translate-y-full');
             
-            startCamera(1);
+            afterSheetOpens(() => startCamera(1));
             
         } else {
             alert("This order has been fully dispatched.");
