@@ -6,8 +6,15 @@ let globalOrders = [];
 let stream = null;
 let loaderInterval;
 
-let pendingUploads = 0; // NEW: Tracks how many items are currently saving to Google
+let pendingUploads = 0; // Tracks how many items are currently saving to Google
 let isSyncing = false;
+
+// ============================================================
+// FIX #1: SPEED — lower camera resolution so Step 2 isn't laggy
+// (previously no width/height was requested, so phones defaulted
+// to their max resolution, e.g. 4K, which is heavy to render,
+// draw to canvas, and compress on every capture)
+// ============================================================
 async function startCamera(step) {
     const feed = document.getElementById(`camera-feed-${step}`);
     const preview = document.getElementById(`camera-preview-${step}`);
@@ -26,7 +33,11 @@ async function startCamera(step) {
     try {
         if(stream) stopCamera(); // kill any running camera before starting a new one
         stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: 'environment' }, 
+            video: { 
+                facingMode: 'environment',
+                width: { ideal: 960 },
+                height: { ideal: 720 }
+            }, 
             audio: false 
         });
         
@@ -85,8 +96,6 @@ function retakePhoto(step) {
 
 // --- POPUP FLOW LOGIC ---
 
-
-
 function completeStep1() {
     stopCamera(); // Make sure camera 1 is dead
     
@@ -114,11 +123,42 @@ function completeDispatch() {
     closeBottomSheet();
 }
 
+// ============================================================
+// FIX #2: BACK BUTTON — close the sheet instead of the whole app
+//
+// How it works: the moment the sheet opens we push a dummy
+// history entry. Phone's back button then just pops THAT entry
+// (fires 'popstate') instead of leaving the page/app. We catch
+// popstate and close the sheet's UI there.
+//
+// Any place that used to call closeBottomSheet() directly now
+// goes through history.back(), which triggers the same popstate
+// handler — so there's only one place that actually closes the UI.
+// ============================================================
+let sheetHistoryPushed = false;
+
 function closeBottomSheet() {
+    if (sheetHistoryPushed) {
+        // This will trigger the popstate listener below,
+        // which actually hides the sheet.
+        history.back();
+    } else {
+        actuallyCloseBottomSheet();
+    }
+}
+
+function actuallyCloseBottomSheet() {
     document.getElementById('bottom-sheet-backdrop').classList.add('opacity-0', 'pointer-events-none');
     document.getElementById('order-bottom-sheet').classList.add('translate-y-full');
-    stopCamera(); 
+    stopCamera();
+    sheetHistoryPushed = false;
 }
+
+window.addEventListener('popstate', () => {
+    if (sheetHistoryPushed) {
+        actuallyCloseBottomSheet();
+    }
+});
 
 // --- DATA FETCHING & RENDERING (SWR Pattern) ---
 
@@ -127,7 +167,7 @@ let isFetching = false;
 document.addEventListener("DOMContentLoaded", () => {
     loadOrders();          // Initial fast load
     startSilentPolling();  // Start the heartbeat
-    processSyncQueue();    // NEW: Check if there are left-over images to upload!
+    processSyncQueue();    // Check if there are left-over images to upload!
 });
      
 async function loadOrders() {
@@ -212,6 +252,13 @@ function openBottomSheet(invoiceNo) {
         const step1Done = safeCheck(order["Status of Goods Out"]);
         const step2Done = safeCheck(order["Status of Dispatch"]);
 
+        // Push a history entry so the phone's back button closes
+        // this sheet instead of closing/navigating away from the app.
+        if (!sheetHistoryPushed) {
+            history.pushState({ modal: 'orderSheet' }, '');
+            sheetHistoryPushed = true;
+        }
+
         if (step1Done && !step2Done) {
             // --- STEP 1 IS DONE: Show Summary Card & Open Step 2 ---
             
@@ -274,6 +321,10 @@ function openBottomSheet(invoiceNo) {
             
         } else {
             alert("This order has been fully dispatched.");
+            // We already pushed a history entry above — undo it since we're not opening the sheet.
+            if (sheetHistoryPushed) {
+                history.back();
+            }
             return;
         }
     }
