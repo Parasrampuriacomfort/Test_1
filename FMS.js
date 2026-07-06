@@ -7,7 +7,7 @@ let stream = null;
 let loaderInterval;
 
 let pendingUploads = 0; // Tracks how many items are currently saving to Google
-let isSyncing = false;
+let isSyncing = false; 
 
 // ============================================================
 // FIX #1: SPEED — lower camera resolution so Step 2 isn't laggy
