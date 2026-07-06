@@ -428,7 +428,7 @@ function renderOrders(orders) {
                         <div class="relative w-full h-1 bg-surface-container-high rounded-full">
                             <div class="absolute top-0 left-0 h-1 bg-primary rounded-full ${progressWidth} transition-all duration-500"></div>
                             <div class="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-2 h-2 bg-primary rounded-full"></div>
-                            <div class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 ${progressWidth === 'w-full' || progressWidth === 'w-1/2' ? 'bg-primary border-2 border-surface-container-lowest' : 'bg-surface-container-highest'} rounded-full transition-all duration-500"></div>
+                            <div class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 ${progressWidth === 'w-full' || progressWidth === 'w-1/2' ? 'bg-primary border-2 border-surface-container-lowest' : 'bg-surface-container-highest'} rounded-full transition-all duration-500">📦</div>
                             <div class="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/2 w-2 h-2 ${progressWidth === 'w-full' ? 'bg-primary border-2 border-surface-container-lowest scale-150' : 'bg-surface-container-highest'} rounded-full transition-all duration-500"></div>
                         </div>
                     </div>
