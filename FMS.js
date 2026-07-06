@@ -36,7 +36,8 @@ async function startCamera(step) {
             video: { 
                 facingMode: 'environment',
                 width: { ideal: 960 },
-                height: { ideal: 720 }
+                height: { ideal: 720 },
+                frameRate: { ideal: 24, max: 30 }
             }, 
             audio: false 
         });
@@ -275,8 +276,11 @@ function openBottomSheet(invoiceNo) {
                 
                 if (idMatch && idMatch[1]) {
                     const fileId = idMatch[1];
-                    // Create the proper view link using the unique File ID
-                    step1ImgEl.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
+                    // Delay the thumbnail fetch slightly so it doesn't compete
+                    // with the camera starting up at the exact same instant.
+                    setTimeout(() => {
+                        step1ImgEl.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
+                    }, 400);
                     
                     step1ImgEl.onload = () => {
                         step1ImgEl.classList.remove('hidden');
@@ -572,6 +576,7 @@ function hideLoader(){
 function startSilentPolling() {
     setInterval(async () => {
         if (isFetching) return; 
+        if (stream) return; // camera is active (sheet open) — skip this cycle to avoid lag
         isFetching = true;
 
         try {
