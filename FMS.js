@@ -73,25 +73,6 @@ function stopCamera() {
 // before running `callback`. This avoids starting the camera WHILE
 // the sheet is still animating (transform transition + camera
 // negotiation competing at the same time was the main lag source).
-function afterSheetOpens(callback) {
-    const sheet = document.getElementById('order-bottom-sheet');
-    let done = false;
-    const finish = () => {
-        if (done) return;
-        done = true;
-        sheet.removeEventListener('transitionend', handler);
-        
-        // Defer the heavy camera boot until after the next browser paint
-        requestAnimationFrame(() => {
-            setTimeout(callback, 100); 
-        });
-    };
-    const handler = (e) => {
-        if (e.propertyName === 'transform') finish();
-    };
-    sheet.addEventListener('transitionend', handler);
-    setTimeout(finish, 400); // Safety fallback
-}
 
 function capturePhoto(step) {
     if (!stream) return;
