@@ -7,8 +7,28 @@ let stream = null;
 let loaderInterval;
 
 let pendingUploads = 0; // Tracks how many items are currently saving to Google
-let isSyncing = false;
 
+let isSyncing = false;
+// 1. Setup the audio
+const notificationSound = new Audio('notification.mp3'); // Removed the leading slash just in case
+notificationSound.load(); // Force the browser to preload it
+
+// 2. The "Unlocker" - This silently plays and pauses the sound on the very first screen tap
+document.body.addEventListener('click', function unlockAudio() {
+    notificationSound.play().then(() => {
+        notificationSound.pause();
+        notificationSound.currentTime = 0;
+    }).catch(err => console.log("Audio unlock failed:", err));
+    
+    // Remove this listener so it only runs once
+    document.body.removeEventListener('click', unlockAudio);
+});
+
+                    if (newOrderArrived) {
+                        console.log("🚨 NEW ORDER DETECTED! Attempting to play sound..."); // ADD THIS
+                        notificationSound.currentTime = 0; // Rewind to start
+                        notificationSound.play().catch(err => console.log("Audio blocked by browser:", err));
+                    }
 // ============================================================
 // FIX #1: SPEED — lower camera resolution so Step 2 isn't laggy
 // (previously no width/height was requested, so phones defaulted
