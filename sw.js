@@ -6,6 +6,7 @@ const ASSETS = [
   '/Leave.html',
   '/attendance.js',
   '/manifest.json',
+  '/notification.mp3'
   '/style.css' // <-- Make sure to uncomment or add this if you are using it!
 ];
 
