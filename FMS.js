@@ -1,7 +1,7 @@
 // --- APP CONFIGURATION ---
 const API_URL = "https://script.google.com/macros/s/AKfycbyXnRv1ows5y7sfXyFF4geXxN1taLiuxds9IfETZlQzZWA8JpwAQ9XLGaN9Ga1P8F7qew/exec"; 
 let globalOrders = [];
-
+const notificationSound = new Audio('/notification.mp3');
 // --- MULTI-STEP CAMERA LOGIC ---
 let stream = null;
 let loaderInterval;
@@ -599,19 +599,28 @@ function startSilentPolling() {
             // If the data has changed...
             if (freshData && JSON.stringify(freshData) !== JSON.stringify(globalOrders)) {
                 
-                // 1. Get a list of all the Invoice Numbers we ALREADY have on screen
+                // Get a list of all the Invoice Numbers we ALREADY have on screen
                 const existingInvoices = new Set(globalOrders.map(o => o["Invoice No"]));
                 
-                // 2. Tag the brand new ones (only if this isn't the very first time the app is loading)
+                // Tag the brand new ones (only if this isn't the very first time the app is loading)
                 if (existingInvoices.size > 0) {
+                    let newOrderArrived = false; // Flag to track if we need to play a sound
+                    
                     freshData.forEach(order => {
                         if (!existingInvoices.has(order["Invoice No"])) {
                             order._isNewlyAdded = true; // Flag for animation
+                            newOrderArrived = true;     // We found a completely new order!
                             
                             // Remove the flag after 3 seconds so it doesn't re-animate if they click it later
                             setTimeout(() => { delete order._isNewlyAdded; }, 3000);
                         }
                     });
+                    
+                    // PLAY THE SOUND HERE
+                    if (newOrderArrived) {
+                        // .catch() prevents the app from crashing if the browser blocks auto-play
+                        notificationSound.play().catch(err => console.log("Audio blocked by browser:", err));
+                    }
                 }
 
                 console.log("New order detected! Updating UI quietly...");
@@ -626,7 +635,6 @@ function startSilentPolling() {
         }
     }, 10000); // 10 seconds
 }
-
 
 async function processSyncQueue() {
     if (isSyncing) return; // Don't run multiple at once
