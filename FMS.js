@@ -710,3 +710,29 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
+
+
+function sendPushNotification(invoiceNumber, customerName) {
+  var oneSignalAppId = "902b4376-9b2d-4508-98d9-a6ba0bd25e78";
+  var oneSignalRestApiKey = "os_v2_app_savug5u3fvcqrggzu25axus6pdp7na6tplnuxfnxey2dvlqhbh6xvcny4yggsmfzbzctdhy7o4j5kvny2a4sqn37errwwynqmhvkwva";
+
+  var payload = {
+    "app_id": oneSignalAppId,
+    "included_segments": ["Subscribed Users"], // Sends to everyone who clicked "Allow"
+    "headings": {"en": "🚨 New Order: " + invoiceNumber},
+    "contents": {"en": customerName + " just placed an order!"}
+  };
+
+  var options = {
+    "method": "post",
+    "contentType": "application/json",
+    "headers": {
+      "Authorization": "Basic " + oneSignalRestApiKey
+    },
+    "payload": JSON.stringify(payload)
+  };
+
+  // This tells OneSignal to wake up the phones and send the alert
+  UrlFetchApp.fetch("https://onesignal.com/api/v1/notifications", options);
+}
