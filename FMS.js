@@ -1,34 +1,14 @@
 // --- APP CONFIGURATION ---
 const API_URL = "https://script.google.com/macros/s/AKfycbyXnRv1ows5y7sfXyFF4geXxN1taLiuxds9IfETZlQzZWA8JpwAQ9XLGaN9Ga1P8F7qew/exec"; 
 let globalOrders = [];
-const notificationSound = new Audio('/notification.mp3');
+
 // --- MULTI-STEP CAMERA LOGIC ---
 let stream = null;
 let loaderInterval;
 
 let pendingUploads = 0; // Tracks how many items are currently saving to Google
-
 let isSyncing = false;
-// 1. Setup the audio
-const notificationSound = new Audio('notification.mp3'); // Removed the leading slash just in case
-notificationSound.load(); // Force the browser to preload it
 
-// 2. The "Unlocker" - This silently plays and pauses the sound on the very first screen tap
-document.body.addEventListener('click', function unlockAudio() {
-    notificationSound.play().then(() => {
-        notificationSound.pause();
-        notificationSound.currentTime = 0;
-    }).catch(err => console.log("Audio unlock failed:", err));
-    
-    // Remove this listener so it only runs once
-    document.body.removeEventListener('click', unlockAudio);
-});
-
-                    if (newOrderArrived) {
-                        console.log("🚨 NEW ORDER DETECTED! Attempting to play sound..."); // ADD THIS
-                        notificationSound.currentTime = 0; // Rewind to start
-                        notificationSound.play().catch(err => console.log("Audio blocked by browser:", err));
-                    }
 // ============================================================
 // FIX #1: SPEED — lower camera resolution so Step 2 isn't laggy
 // (previously no width/height was requested, so phones defaulted
@@ -619,28 +599,19 @@ function startSilentPolling() {
             // If the data has changed...
             if (freshData && JSON.stringify(freshData) !== JSON.stringify(globalOrders)) {
                 
-                // Get a list of all the Invoice Numbers we ALREADY have on screen
+                // 1. Get a list of all the Invoice Numbers we ALREADY have on screen
                 const existingInvoices = new Set(globalOrders.map(o => o["Invoice No"]));
                 
-                // Tag the brand new ones (only if this isn't the very first time the app is loading)
+                // 2. Tag the brand new ones (only if this isn't the very first time the app is loading)
                 if (existingInvoices.size > 0) {
-                    let newOrderArrived = false; // Flag to track if we need to play a sound
-                    
                     freshData.forEach(order => {
                         if (!existingInvoices.has(order["Invoice No"])) {
                             order._isNewlyAdded = true; // Flag for animation
-                            newOrderArrived = true;     // We found a completely new order!
                             
                             // Remove the flag after 3 seconds so it doesn't re-animate if they click it later
                             setTimeout(() => { delete order._isNewlyAdded; }, 3000);
                         }
                     });
-                    
-                    // PLAY THE SOUND HERE
-                    if (newOrderArrived) {
-                        // .catch() prevents the app from crashing if the browser blocks auto-play
-                        notificationSound.play().catch(err => console.log("Audio blocked by browser:", err));
-                    }
                 }
 
                 console.log("New order detected! Updating UI quietly...");
@@ -655,6 +626,7 @@ function startSilentPolling() {
         }
     }, 10000); // 10 seconds
 }
+
 
 async function processSyncQueue() {
     if (isSyncing) return; // Don't run multiple at once
@@ -709,30 +681,4 @@ if ('serviceWorker' in navigator) {
         console.error('Service Worker registration failed:', error);
       });
   });
-}
-
-
-
-function sendPushNotification(invoiceNumber, customerName) {
-  var oneSignalAppId = "902b4376-9b2d-4508-98d9-a6ba0bd25e78";
-  var oneSignalRestApiKey = "os_v2_app_savug5u3fvcqrggzu25axus6pdp7na6tplnuxfnxey2dvlqhbh6xvcny4yggsmfzbzctdhy7o4j5kvny2a4sqn37errwwynqmhvkwva";
-
-  var payload = {
-    "app_id": oneSignalAppId,
-    "included_segments": ["Subscribed Users"], // Sends to everyone who clicked "Allow"
-    "headings": {"en": "🚨 New Order: " + invoiceNumber},
-    "contents": {"en": customerName + " just placed an order!"}
-  };
-
-  var options = {
-    "method": "post",
-    "contentType": "application/json",
-    "headers": {
-      "Authorization": "Basic " + oneSignalRestApiKey
-    },
-    "payload": JSON.stringify(payload)
-  };
-
-  // This tells OneSignal to wake up the phones and send the alert
-  UrlFetchApp.fetch("https://onesignal.com/api/v1/notifications", options);
 }
