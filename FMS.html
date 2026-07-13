@@ -359,3 +359,20 @@
 
    <script src="FMS.js"></script>
 </body></html>
+
+
+
+<!-- Add this inside the <head> of FMS.html -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(function(OneSignal) {
+    OneSignal.init({
+      appId: "902b4376-9b2d-4508-98d9-a6ba0bd25e78", // Replace with your actual App ID
+      safari_web_id: "YOUR_SAFARI_WEB_ID", // (Optional) for iOS Safari support
+      notifyButton: {
+        enable: true, // Shows a bell icon so users can subscribe
+      },
+    });
+  });
+</script>
